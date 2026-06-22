@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="en" dir="ltr" class="no-js">
+<head>
+  <meta charset="utf-8" />
+  <!-- Pre-paint bootstrap (no-js swap + theme restore). See /en/index.html
+       for the full rationale comment; behaviour is identical across pages. -->
+  <script>
+    (function () {
+      var d = document.documentElement;
+      d.classList.replace('no-js', 'js');
+      try {
+        var t = localStorage.getItem('mantis-theme');
+        if (t && ['amber','green','cyan','mono'].indexOf(t) >= 0 && t !== 'mono') {
+          d.setAttribute('data-theme', t);
+        }
+      } catch (e) {}
+    })();
+  </script>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; form-action 'self'; img-src 'self' data:; font-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; connect-src 'self' https://api.github.com; object-src 'none'" />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
+
+  <title>privacy — mantis</title>
+  <meta name="description" content="What this website does (and doesn't) with your data. No cookies, no analytics, no third-party trackers. Every outbound endpoint listed in full." />
+  <meta name="application-name" content="mantis" />
+  <meta name="author" content="privacykey" />
+  <meta name="robots" content="index, follow" />
+  <meta name="theme-color" content="#0B0B0B" />
+  <meta name="color-scheme" content="dark" />
+  <link rel="canonical" href="https://mantis.privacykey.org/en/privacy.html" />
+
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/favicon.svg" />
+  <link rel="icon" href="../favicon.ico" sizes="any" />
+  <link rel="manifest" href="../site.webmanifest" />
+
+  <link rel="stylesheet" href="../assets/site.css" />
+</head>
+<body>
+
+<a class="skip-link" href="#main">Skip to content</a>
+
+<nav class="nav" aria-label="Primary">
+  <div class="container nav-inner">
+    <a href="./index.html" class="nav-brand" aria-label="mantis home">
+      <span class="mark" aria-hidden="true">◉</span>
+      <span class="wm">mantis</span>
+    </a>
+    <div class="nav-links">
+      <a href="./index.html#architecture" class="nav-link-inline">architecture</a>
+      <a href="./index.html#capabilities" class="nav-link-inline">capabilities</a>
+      <a href="./index.html#compare" class="nav-link-inline">full vs edge</a>
+      <a href="./docs.html" class="nav-link-inline">docs</a>
+      <label class="theme-switcher" aria-label="Color theme">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="9"/>
+          <circle cx="12" cy="7"  r="1.2" fill="currentColor" stroke="none"/>
+          <circle cx="17" cy="13" r="1.2" fill="currentColor" stroke="none"/>
+          <circle cx="9"  cy="16" r="1.2" fill="currentColor" stroke="none"/>
+        </svg>
+        <select data-theme-select aria-label="Color theme">
+          <option value="mono">mono · modern</option>
+          <option value="amber">amber · IBM 5151</option>
+          <option value="green">phosphor · CRT</option>
+          <option value="cyan">cyan · DEC</option>
+        </select>
+      </label>
+      <a href="https://github.com/privacykey/mantis" class="nav-cta" target="_blank" rel="noopener">
+        github
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M7 17L17 7M17 7H8M17 7V16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+    </div>
+  </div>
+</nav>
+
+<main id="main">
+
+<section>
+  <div class="container">
+    <article class="prose" style="max-width: 820px;">
+      <p class="kicker">privacy</p>
+      <h1>What this site does with your data.</h1>
+
+      <p>
+        Short answer: nothing it doesn't have to. This page is the long
+        answer — every outbound request this website makes, what data
+        crosses the wire, and how to make it quieter if you'd rather.
+      </p>
+
+      <div class="callout-no-collect" role="img" aria-label="No personal data collected by this website.">
+        <div class="tick" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M5 12 L10 17 L19 7"/></svg>
+        </div>
+        <div>
+          <h3>No personal data collected</h3>
+          <p>No cookies, no analytics, no fingerprinting, no third-party trackers. We don't run a server that records your visit.</p>
+        </div>
+      </div>
+
+      <h2>Third parties this website talks to</h2>
+
+      <p>
+        Most of the site is static — HTML, CSS, a couple of small scripts,
+        and Three.js for the 3D globe. None of that calls anywhere off our
+        origin. There's exactly one outbound endpoint, listed below.
+      </p>
+
+      <div class="subproc-group">
+        <h3>GitHub Actions build status</h3>
+        <p class="group-sub">
+          The footer shows the latest CI run for the <code>mantis</code> repo
+          (passing / failing / running). To get that signal, one anonymous
+          API call runs on page load.
+        </p>
+
+        <div class="subproc-card">
+          <div class="head">
+            <h4>GitHub — public REST API</h4>
+            <span class="nec-chip optional">Optional</span>
+          </div>
+          <code class="endpoint">api.github.com/repos/privacykey/mantis/actions/runs?per_page=1</code>
+          <dl>
+            <dt>When it runs</dt><dd>Once on first page load. Result is cached in <code>localStorage</code> for 5 minutes, so reloads and inter-page nav don't re-hit the API.</dd>
+            <dt>What we send</dt><dd>A standard unauthenticated <code>GET</code> request. Your IP, your User-Agent, and an <code>Accept</code> header — nothing else. No cookies, no identifiers.</dd>
+            <dt>What we receive</dt><dd>JSON describing the most recent workflow run: status, conclusion, timestamps. We use one of those fields to colour the build badge.</dd>
+            <dt>How to disable</dt><dd>Block <code>api.github.com</code> in your browser, or use a content blocker. The badge will hide itself when the request fails; nothing else on the page depends on it.</dd>
+          </dl>
+          <p class="their-policy"><a href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement" target="_blank" rel="noopener">GitHub's privacy policy ↗</a></p>
+        </div>
+      </div>
+
+      <h2>What we don't do</h2>
+
+      <ul>
+        <li><strong>No cookies.</strong> The site sets none, reads none, and works fine in private-browsing mode with all storage cleared.</li>
+        <li><strong>No analytics.</strong> No Google Analytics, no Plausible, no Fathom, no in-house pixel. We don't count visits.</li>
+        <li><strong>No third-party fonts, scripts, or images.</strong> Everything except the GitHub API call above is served from this origin.</li>
+        <li><strong>No ads.</strong> There are no advertising networks, no remarketing pixels, and no affiliate links.</li>
+        <li><strong>No social embeds.</strong> Twitter / X, YouTube, etc. all load tracking content; we don't embed any of them.</li>
+      </ul>
+
+      <h2>localStorage — what stays in your browser</h2>
+
+      <p>
+        Two small keys are written to <code>localStorage</code> on this
+        origin. Neither leaves your browser, and you can clear them at
+        any time from your browser's storage settings.
+      </p>
+
+      <ul>
+        <li><code>mantis-theme</code> — which colour theme (mono / amber / green / cyan) you picked from the dropdown, so the choice survives reloads. Default: <code>mono</code>.</li>
+        <li><code>mantis-build-status</code> — the cached GitHub Actions result, with a 5-minute TTL. Lets the footer paint instantly on inter-page nav without re-hitting the API.</li>
+      </ul>
+
+      <h2>What mantis itself does (the software)</h2>
+
+      <p>
+        This site is marketing. The actual mantis software you'd install
+        on your own infrastructure has a different threat model and a
+        different set of outbound calls — by definition, since the whole
+        point of mantis is to receive HTTP requests and forward
+        notifications.
+      </p>
+
+      <p>
+        For a default install of <a href="./index.html#compare">mantis full</a>
+        on your own server:
+      </p>
+
+      <ul>
+        <li>Inbound: a unique <code>/c/&lt;id&gt;</code> URL accepts hits from anywhere on the public internet (that's the canary trigger). The server records the hit's <code>IP</code>, <code>User-Agent</code>, headers, and timestamp into your Postgres.</li>
+        <li>Outbound: whatever notification destinations you configure — webhook, email, Slack, Discord, Teams, Home Assistant, or Uptime Kuma. Nothing else.</li>
+        <li>No telemetry phones home. mantis doesn't call privacykey, doesn't report version, doesn't ping for updates.</li>
+      </ul>
+
+      <p>
+        For <a href="./index.html#edge">mantis edge</a> on Cloudflare
+        Workers, the same shape holds — but the data crosses Cloudflare's
+        infrastructure, so their privacy policy applies in addition to
+        whatever you configure on top. Cloudflare sees your visitors'
+        traffic the same way they would for any Worker.
+      </p>
+
+      <h2>Questions or corrections</h2>
+
+      <p>
+        If something on this page looks wrong, incomplete, or out of date,
+        please <a href="https://github.com/privacykey/mantis/issues" target="_blank" rel="noopener">open an issue on GitHub</a>.
+        The full list of third-party libraries this site uses (plus the
+        ones mantis itself uses, server-side) is on the
+        <a href="./legal.html">legal page</a>.
+      </p>
+
+      <p class="meta-line">Last updated May 2026. If our practices change, we update this page and bump the date here.</p>
+
+      <p style="margin-top: 32px;">
+        <a href="./index.html">← back to the front page</a>
+      </p>
+    </article>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="container">
+    <div class="footer-inner">
+      <div>
+        <p class="footer-brand">
+          <span class="mark" aria-hidden="true">◉</span>
+          <span class="wm">mantis</span>
+        </p>
+        <p class="footer-tag">
+          A self-hostable canary-token service. A
+          <a href="https://github.com/privacykey">privacykey</a> project.
+        </p>
+      </div>
+      <div class="footer-col">
+        <h4>product</h4>
+        <a href="./index.html#architecture">architecture</a><br />
+        <a href="./index.html#capabilities">capabilities</a><br />
+        <a href="./index.html#compare">mantis full</a><br />
+        <a href="./index.html#edge">mantis edge</a><br />
+        <a href="./docs.html">docs</a>
+      </div>
+      <div class="footer-col">
+        <h4>source</h4>
+        <a href="https://github.com/privacykey/mantis" target="_blank" rel="noopener">github ↗</a><br />
+        <a href="https://github.com/privacykey/mantis/issues" target="_blank" rel="noopener">issues ↗</a><br />
+        <a href="https://github.com/privacykey" target="_blank" rel="noopener">privacykey org ↗</a>
+      </div>
+      <div class="footer-col">
+        <h4>this site</h4>
+        <a href="./about.html">about</a><br />
+        <a href="./privacy.html">privacy</a><br />
+        <a href="./legal.html">legal &amp; licences</a><br />
+        <a href="../llms.txt" target="_blank" rel="noopener">llms.txt ↗</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© <span id="year">2026</span> privacykey · MIT License</span>
+      <span class="runtime">
+        <span class="version">CLI v0.1.6 · full v0.1.1 · edge v0.1.3</span>
+        <span class="sep">·</span>
+        <a class="build na" data-build-status href="https://github.com/privacykey/mantis/actions" target="_blank" rel="noopener" aria-label="Latest GitHub Actions run">
+          <span class="dot">●</span> build · checking
+        </a>
+      </span>
+    </div>
+  </div>
+</footer>
+
+<script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+<script src="../assets/theme.js"></script>
+<script src="../assets/footer.js"></script>
+
+</body>
+</html>

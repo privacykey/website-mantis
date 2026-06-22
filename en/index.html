@@ -1,0 +1,709 @@
+<!doctype html>
+<html lang="en" dir="ltr" class="no-js">
+<head>
+  <meta charset="utf-8" />
+  <!-- Pre-paint bootstrap. Does two jobs before CSS loads:
+        1. Swap .no-js → .js on <html> so progressive-enhancement rules
+           apply (site.css hides .hero-globe under .no-js to avoid empty
+           canvas placeholders if scripts never run).
+        2. Read the user's saved theme from localStorage and set
+           data-theme on <html>. Done synchronously here to prevent a
+           flash of the wrong palette while CSS is still parsing.
+       Whitelist of theme names matches the [data-theme] blocks in
+       site.css; an unknown value is ignored and falls through to the
+       default (amber). -->
+  <script>
+    (function () {
+      var d = document.documentElement;
+      d.classList.replace('no-js', 'js');
+      try {
+        var t = localStorage.getItem('mantis-theme');
+        if (t && ['amber','green','cyan','mono'].indexOf(t) >= 0 && t !== 'mono') {
+          d.setAttribute('data-theme', t);
+        }
+      } catch (e) {}
+    })();
+  </script>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+
+  <!-- Defence-in-depth headers, mirrored from privacykey/privacytracker.
+       Static hosts (GitHub Pages, S3, Pages) can't set HTTP headers, so
+       we apply the meta-supported subset here. self-only on every axis;
+       the only inline blocks are the no-js→js swap above and the
+       structured-data JSON-LD below. -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; form-action 'self'; img-src 'self' data:; font-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; connect-src 'self' https://api.github.com; object-src 'none'" />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
+
+  <title>mantis — self-hostable canary-token service</title>
+  <meta name="description" content="mantis mints unique URLs you can hide in files, hosts, and websites. When something fetches one, you get notified — webhook, email, Slack, Discord, Teams, or Home Assistant. Self-hostable. API-first. Open source." />
+  <meta name="application-name" content="mantis" />
+  <meta name="keywords" content="canary token, honeytoken, honey token, mantis, tripwire, insider threat, leaked credentials, honeypot, self-hosted, webhook, slack, discord, ssh detection, file canary, privacykey" />
+  <meta name="author" content="privacykey" />
+  <meta name="robots" content="index, follow, max-image-preview:large" />
+  <meta name="googlebot" content="index, follow" />
+
+  <!-- Dark only by design — there is no light scheme. We still declare it
+       so native UI (scrollbars, form controls) render in matching colours. -->
+  <meta name="theme-color" content="#0B0B0B" />
+  <meta name="color-scheme" content="dark" />
+
+  <link rel="canonical" href="https://mantis.privacykey.org/en/" />
+  <link rel="alternate" hreflang="en" href="https://mantis.privacykey.org/en/" />
+  <link rel="alternate" hreflang="x-default" href="https://mantis.privacykey.org/en/" />
+
+  <!-- Favicon — inline SVG keeps us at zero extra fetches; the wordmark is
+       just an amber lowercase "m" inside a square bracket. Browsers that
+       can't render SVG icons fall back to favicon.ico in the site root. -->
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/favicon.svg" />
+  <link rel="icon" href="../favicon.ico" sizes="any" />
+  <link rel="manifest" href="../site.webmanifest" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="mantis" />
+
+  <!-- Open Graph + Twitter card. -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="mantis" />
+  <meta property="og:title" content="mantis — self-hostable canary-token service" />
+  <meta property="og:description" content="Mint a URL. Hide it in a file, a host, or a website. When something fetches it — you'll know who." />
+  <meta property="og:url" content="https://mantis.privacykey.org/en/" />
+  <meta property="og:locale" content="en_US" />
+
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="mantis — self-hostable canary-token service" />
+  <meta name="twitter:description" content="Mint a URL. Hide it in a file, a host, or a website. When something fetches it — you'll know who." />
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "mantis",
+    "applicationCategory": "SecurityApplication",
+    "applicationSubCategory": "Canary token service",
+    "operatingSystem": "Docker (Linux, macOS, Windows host)",
+    "description": "Self-hostable canary-token service. API-first. Mint unique URLs, hide them in files, hosts, and websites — get notified when something fetches one.",
+    "url": "https://mantis.privacykey.org/",
+    "downloadUrl": "https://github.com/privacykey/mantis",
+    "softwareVersion": "0.1.6",
+    "license": "https://opensource.org/license/mit/",
+    "isAccessibleForFree": true,
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+    "publisher": { "@type": "Organization", "name": "privacykey", "url": "https://github.com/privacykey" }
+  }
+  </script>
+
+  <link rel="stylesheet" href="../assets/site.css" />
+</head>
+<body>
+
+<a class="skip-link" href="#main">Skip to content</a>
+
+<nav class="nav" aria-label="Primary">
+  <div class="container nav-inner">
+    <a href="#top" class="nav-brand" aria-label="mantis home">
+      <span class="mark" aria-hidden="true">◉</span>
+      <span class="wm">mantis</span>
+    </a>
+    <div class="nav-links">
+      <a href="#architecture" class="nav-link-inline">architecture</a>
+      <a href="#capabilities" class="nav-link-inline">capabilities</a>
+      <a href="#compare" class="nav-link-inline">full vs edge</a>
+      <a href="./docs.html" class="nav-link-inline">docs</a>
+      <!-- Theme switcher. Native <select> so the dropdown UI is the OS's
+           own list (no need to ship a custom popover). Wired by
+           assets/theme.js; the initial selection is restored from
+           localStorage by the inline pre-paint script in <head>. -->
+      <label class="theme-switcher" aria-label="Color theme">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="9"/>
+          <circle cx="12" cy="7"  r="1.2" fill="currentColor" stroke="none"/>
+          <circle cx="17" cy="13" r="1.2" fill="currentColor" stroke="none"/>
+          <circle cx="9"  cy="16" r="1.2" fill="currentColor" stroke="none"/>
+        </svg>
+        <select data-theme-select aria-label="Color theme">
+          <option value="mono">mono · modern</option>
+          <option value="amber">amber · IBM 5151</option>
+          <option value="green">phosphor · CRT</option>
+          <option value="cyan">cyan · DEC</option>
+        </select>
+      </label>
+      <a href="https://github.com/privacykey/mantis" class="nav-cta" target="_blank" rel="noopener" aria-label="View mantis on GitHub (opens in new tab)">
+        github
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M7 17L17 7M17 7H8M17 7V16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+    </div>
+  </div>
+</nav>
+
+<main id="main">
+
+<header class="hero" id="top">
+  <div class="hero-globe" data-mantis-globe aria-hidden="true"><canvas></canvas></div>
+  <div class="container">
+
+    <p class="hero-meta"><span class="ok">●</span> CLI v0.1.6 · full v0.1.1 · edge v0.1.3 · <span>MIT License</span></p>
+
+    <h1>Drop a <span class="underline">mantis</span>.<br />See who's snooping<span class="blink">_</span></h1>
+
+    <p class="lede">
+      Mint a unique URL. Hide it. When something fetches it, mantis tells you
+      — via webhook, email, Slack, Discord, Teams, or Home Assistant.
+    </p>
+
+    <div class="hero-terminal" aria-label="Interactive mantis terminal demo">
+      <div class="term-bar">
+        <span class="dot live" aria-hidden="true"></span>
+        <span class="dot" aria-hidden="true"></span>
+        <span class="dot" aria-hidden="true"></span>
+        <span class="title">mantis@demo · zsh</span>
+        <span class="right">PTY · 80×24</span>
+      </div>
+      <div class="term-body" role="log" aria-live="polite" aria-atomic="false">
+        <!-- The boot banner + scripted command sequence is appended here
+             by mantis-terminal.js. The no-JS fallback below sits inline
+             so visitors with scripts off still see something coherent. -->
+        <noscript>
+          <div class="term-fallback">
+            <p>
+              This is a live demo terminal — but you've got JavaScript disabled,
+              so it's currently quiet. With scripts on, this panel boots a mantis
+              instance, runs <code>mantis new</code>, <code>mantis install</code>,
+              and <code>mantis watch</code>, and streams simulated hits from a
+              rotating set of source IPs. The 3D globe behind it lights up each
+              source on the surface.
+            </p>
+            <p>
+              Either way, everything below is yours to read.
+            </p>
+          </div>
+        </noscript>
+      </div>
+      <div class="term-input-line">
+        <span class="prompt">$</span>
+        <input class="term-input" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="(booting…)" aria-label="Terminal input" />
+      </div>
+    </div>
+
+    <div class="hero-actions">
+      <a class="btn btn-primary" href="#compare">
+        full vs edge
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+      <a class="btn btn-ghost" href="https://github.com/privacykey/mantis" target="_blank" rel="noopener">
+        view source
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M7 17L17 7M17 7H8M17 7V16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+    </div>
+
+  </div>
+</header>
+
+<!-- ─────────────────────────────────────────────────────────────────────
+     Architecture — three discrete pieces, framed up-front so visitors
+     understand the shape of the project before they read any feature
+     list. The CLI controls a server; the server is either "full" (the
+     Next.js + Postgres + dashboard build) or "edge" (the Cloudflare
+     Workers build). Same REST API on both servers, same CLI works
+     against either.
+     ───────────────────────────────────────────────────────────────────── -->
+<section id="architecture">
+  <div class="container">
+    <p class="kicker">architecture</p>
+    <h2>Three pieces.</h2>
+    <p class="intro">
+      A CLI, and a server in two shapes. Pick the one that fits how you want
+      to run it; the same CLI mints against both.
+    </p>
+
+    <div class="arch-grid">
+
+      <article class="arch-card">
+        <span class="arch-tag">// controller</span>
+        <h3>mantis CLI</h3>
+        <p>
+          Terminal client. Mints keys, tails hits, generates baited files and
+          host-event snippets.
+        </p>
+        <ul class="arch-points">
+          <li><code>mantis new · list · hits · watch · install</code></li>
+          <li>Credentials in your OS keychain</li>
+        </ul>
+        <pre class="arch-snippet"><code>brew install privacykey/tap/mantis</code></pre>
+      </article>
+
+      <article class="arch-card">
+        <span class="arch-tag">// self-hosted server</span>
+        <h3>mantis full</h3>
+        <p>
+          Stateful. Next.js + Postgres, web dashboard, REST API, retry queue.
+        </p>
+        <ul class="arch-points">
+          <li>Dashboard · timeline · multi-destination · revocation</li>
+          <li>Docker · Railway · Fly · Render · any VM</li>
+        </ul>
+        <pre class="arch-snippet"><code>docker compose up -d</code></pre>
+      </article>
+
+      <article class="arch-card">
+        <span class="arch-tag">// stateless worker</span>
+        <h3>mantis edge</h3>
+        <p>
+          Stateless. One Cloudflare Worker, no database — the URL itself is
+          the state.
+        </p>
+        <ul class="arch-points">
+          <li>Anycast at 300+ PoPs · sub-50ms · free tier</li>
+          <li>Anyone with the AES key can mint</li>
+        </ul>
+        <pre class="arch-snippet"><code>pnpm exec wrangler deploy</code></pre>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<!-- ─────────────────────────────────────────────────────────────────────
+     Capabilities — five "what mantis catches" cards. Each one maps to a
+     README section (file keys, honey directory, host-event keys, web-embed
+     snippets, Uptime Kuma fan-out). Status pills are deliberately set to
+     ARMED on every card; the demo terminal above is what shows them firing.
+     ───────────────────────────────────────────────────────────────────── -->
+<section id="capabilities">
+  <div class="container">
+    <p class="kicker">what mantis catches</p>
+    <h2>One URL, many traps.</h2>
+    <p class="intro">
+      Plant the same URL in ten file formats, twelve host events, two web
+      embeds, NFC tags, and Apple Wallet passes. Every trap fires the same key.
+    </p>
+
+    <div class="cap-grid">
+
+      <article class="cap">
+        <div class="cap-head">
+          <span class="cap-status armed">armed</span>
+          <span class="cap-id">file-keys/01</span>
+        </div>
+        <h3>Insider snooping on baited documents</h3>
+        <p>
+          Generate <code>.docx</code>, <code>.xlsx</code>, <code>.pptx</code>,
+          <code>.pdf</code>, and six other formats with the URL embedded.
+          Drop one on a shared drive. When someone opens it, mantis fires.
+        </p>
+      </article>
+
+      <article class="cap">
+        <div class="cap-head">
+          <span class="cap-status armed">armed</span>
+          <span class="cap-id">file-keys/02</span>
+        </div>
+        <h3>The honey directory</h3>
+        <p>
+          One zip, nine pre-baited files — salary spreadsheet, layoff PDF, fake
+          <code>passwords.txt</code>. A curious spelunker opens any of them
+          and the same key fires.
+        </p>
+      </article>
+
+      <article class="cap">
+        <div class="cap-head">
+          <span class="cap-status armed">armed</span>
+          <span class="cap-id">host-events/01</span>
+        </div>
+        <h3>Unfamiliar activity on your computer</h3>
+        <p>
+          Twelve installers for shell, sudo, login, boot, wake, Wi-Fi join, VPN,
+          Ethernet. SSH sessions report <em>the client's</em> IP, not yours.
+          macOS, Linux, Windows.
+        </p>
+      </article>
+
+      <article class="cap">
+        <div class="cap-head">
+          <span class="cap-status armed">armed</span>
+          <span class="cap-id">smart-home/01</span>
+        </div>
+        <h3>Smart-home &amp; IoT — both ways</h3>
+        <p>
+          Door opened. Lock unlocked. Person detected. Snippets for
+          <code>Home Assistant</code> and <code>Scrypted</code> turn any
+          automation event into a hit; a LAN watcher covers devices with no
+          webhooks. And it runs in reverse — a hit can post back to a Home
+          Assistant webhook to flip a switch, fire a scene, or cut a VLAN.
+        </p>
+      </article>
+
+      <article class="cap">
+        <div class="cap-head">
+          <span class="cap-status armed">armed</span>
+          <span class="cap-id">web-embed/01</span>
+        </div>
+        <h3>Cloned sites &amp; copied stylesheets</h3>
+        <p>
+          Hide the URL in your CSS or JS. If a phishing kit copies it to
+          another domain, the rendered page calls home with the cloner's
+          referer.
+        </p>
+      </article>
+
+      <article class="cap">
+        <div class="cap-head">
+          <span class="cap-status armed">armed</span>
+          <span class="cap-id">physical/01</span>
+        </div>
+        <h3>Tapped tags &amp; wallet passes</h3>
+        <p>
+          Write the URL to a blank NFC tag (NTAG213/215/216), or print a
+          QR/NFC sticker label. Or mint an Apple Wallet <code>.pkpass</code> —
+          its install, uninstall, and fetch callbacks each fire the key.
+        </p>
+      </article>
+
+      <article class="cap">
+        <div class="cap-head">
+          <span class="cap-status armed">armed</span>
+          <span class="cap-id">notify/01</span>
+        </div>
+        <h3>Fan out through your existing alerting</h3>
+        <p>
+          Native: webhook, email, Slack, Discord, Teams, Home Assistant. Plus
+          a per-key status URL Uptime Kuma can watch — inherit its 80+ channels
+          (Telegram, ntfy, Matrix, Signal).
+        </p>
+      </article>
+
+      <article class="cap">
+        <div class="cap-head">
+          <span class="cap-status armed">armed</span>
+          <span class="cap-id">reliability/01</span>
+        </div>
+        <h3>Quiet under load, loud when it matters</h3>
+        <p>
+          Dedupe window suppresses repeat-fire notifications. Postgres-backed
+          retry queue with exponential backoff. No Redis, no silent failures.
+        </p>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<!-- ─────────────────────────────────────────────────────────────────────
+     Compare — side-by-side full vs edge, with the CLI framed as the
+     unifying controller. Replaces the old quickstart section: install
+     paths now live on mantis-docs.privacykey.org, so the front page is
+     free to focus on the architectural decision instead.
+     ───────────────────────────────────────────────────────────────────── -->
+<section id="compare">
+  <div class="container">
+    <p class="kicker">choose your shape</p>
+    <h2>Two servers. One CLI.</h2>
+    <p class="intro">
+      Both servers are controlled by the same <code>mantis</code> binary —
+      same install (<code>brew install privacykey/tap/mantis</code>), same
+      command surface, same hit payload shape. The mint path is the only
+      thing that differs.
+    </p>
+
+    <div class="compare-wrap">
+      <table class="compare" aria-label="Compare mantis full and mantis edge">
+        <thead>
+          <tr>
+            <th scope="col"></th>
+            <th scope="col">mantis full</th>
+            <th scope="col">mantis edge</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">shape</th>
+            <td data-label="full">Stateful Next.js server</td>
+            <td data-label="edge">Stateless Cloudflare Worker</td>
+          </tr>
+          <tr>
+            <th scope="row">state lives in</th>
+            <td data-label="full">Postgres</td>
+            <td data-label="edge">The URL itself (AES-encrypted)</td>
+          </tr>
+          <tr>
+            <th scope="row">dashboard</th>
+            <td data-label="full">Yes — <code>/keys</code>, <code>/login</code></td>
+            <td data-label="edge">None</td>
+          </tr>
+          <tr>
+            <th scope="row">REST API</th>
+            <td data-label="full">Full <code>/api/keys/*</code></td>
+            <td data-label="edge">Trigger endpoint only</td>
+          </tr>
+          <tr>
+            <th scope="row">mint via CLI</th>
+            <td data-label="full"><code>mantis new</code> → server round-trip</td>
+            <td data-label="edge"><code>mantis edge mint</code> → local AES encrypt</td>
+          </tr>
+          <tr>
+            <th scope="row">hit history</th>
+            <td data-label="full">Persisted in Postgres</td>
+            <td data-label="edge">Your webhook receiver records it</td>
+          </tr>
+          <tr>
+            <th scope="row">retry queue</th>
+            <td data-label="full">Postgres-backed, exponential backoff</td>
+            <td data-label="edge">Whatever the webhook delivers</td>
+          </tr>
+          <tr>
+            <th scope="row">revoking a key</th>
+            <td data-label="full"><code>mantis disable &lt;id&gt;</code></td>
+            <td data-label="edge">Rotate the AES key (invalidates every URL)</td>
+          </tr>
+          <tr>
+            <th scope="row">runs on</th>
+            <td data-label="full">Docker · Railway · Fly · Render · any VM</td>
+            <td data-label="edge">Cloudflare Workers</td>
+          </tr>
+          <tr>
+            <th scope="row">cost</th>
+            <td data-label="full">Your own infrastructure</td>
+            <td data-label="edge">Free tier covers personal use</td>
+          </tr>
+          <tr>
+            <th scope="row">best for</th>
+            <td data-label="full">Primary tripwires · fleet deployment</td>
+            <td data-label="edge">Hand-off URLs · CI · no-central-log</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p style="font-size: 13px; color: var(--accent-soft); margin: 24px 0 0; line-height: 1.7;">
+      <span style="color: var(--accent-dim);">// </span>
+      Install + deploy walkthroughs at
+      <a href="https://mantis-docs.privacykey.org/getting-started" target="_blank" rel="noopener">mantis-docs.privacykey.org/getting-started</a>.
+      Most teams run both — full for the dashboard, edge for hand-off URLs.
+    </p>
+  </div>
+</section>
+
+<!-- ─────────────────────────────────────────────────────────────────────
+     mantis edge — a wildly different shape from mantis full. Stateless
+     Cloudflare Worker. No database, no dashboard, no management API. The
+     trigger URL is itself an AES-encrypted blob carrying the webhook
+     destination. The Worker decrypts on hit and forwards; the webhook
+     receiver becomes the audit log.
+     ───────────────────────────────────────────────────────────────────── -->
+<section id="edge">
+  <div class="container">
+    <p class="kicker">stateless variant</p>
+    <h2>mantis edge — the URL is the database.</h2>
+    <p class="intro">
+      One Cloudflare Worker, no database. The trigger URL itself is an
+      AES-encrypted blob carrying the webhook destination — on hit, the
+      Worker decrypts, forwards, and forgets. Your webhook receiver is
+      the audit log.
+    </p>
+
+    <div class="stats" aria-label="mantis edge by the numbers">
+      <div class="stat">
+        <span class="n">300<span class="unit">+</span></span>
+        <div class="label">PoPs · anycast</div>
+      </div>
+      <div class="stat">
+        <span class="n">~50<span class="unit">ms</span></span>
+        <div class="label">edge response time</div>
+      </div>
+      <div class="stat">
+        <span class="n">0<span class="unit"></span></span>
+        <div class="label">databases to host</div>
+      </div>
+      <div class="stat">
+        <span class="n">$0<span class="unit"></span></span>
+        <div class="label">cloudflare free tier</div>
+      </div>
+    </div>
+
+    <div class="edge-board">
+      <div class="code-wrap" style="margin: 0;">
+        <div class="code-head"><span class="lang">shell</span><span class="head-right"><span class="hint">deploy + mint</span><button class="code-copy" data-copy type="button" aria-label="Copy command">copy</button></span></div>
+<pre class="code-block"><span class="c"># 1. Generate the 32-byte AES key that mints + decrypts URLs.</span>
+<span class="p">$</span> mantis edge keygen
+
+<span class="c"># 2. Store it as a Worker secret on Cloudflare.</span>
+<span class="p">$</span> pnpm exec wrangler secret put MANTIS_EDGE_KEY
+
+<span class="c"># 3. (Optional) restrict webhook destinations to specific hosts.</span>
+<span class="p">$</span> pnpm exec wrangler secret put MANTIS_EDGE_WEBHOOK_ALLOWLIST
+
+<span class="c"># 4. Ship the Worker.</span>
+<span class="p">$</span> pnpm exec wrangler deploy
+<span class="c">  → https://mantis-edge.&lt;subdomain&gt;.workers.dev</span>
+
+<span class="c"># 5. Tell the CLI which Worker to mint against; save the key locally.</span>
+<span class="p">$</span> mantis edge set-key https://mantis-edge.&lt;subdomain&gt;.workers.dev
+
+<span class="c"># 6. Mint a URL. No round-trip — the URL is generated locally.</span>
+<span class="p">$</span> mantis edge mint \
+    --worker https://mantis-edge.&lt;subdomain&gt;.workers.dev \
+    --webhook https://hooks.slack.com/services/... \
+    --channel slack \
+    --memo <span class="s">"edge smoke test"</span> --test</pre>
+      </div>
+
+      <div>
+        <h3 style="font-family: var(--mono); font-size: 16px; font-weight: 700; color: var(--accent); margin: 0 0 12px; letter-spacing: -0.2px;">how it works</h3>
+        <ul>
+          <li><code>mantis edge mint</code> runs locally — the URL encodes the webhook, channel, and memo. No Worker round-trip.</li>
+          <li>On hit, the Worker decrypts and forwards. Formats for <code>slack</code> / <code>discord</code> / <code>teams</code> if requested.</li>
+          <li><code>MANTIS_EDGE_WEBHOOK_ALLOWLIST</code> restricts where URLs can fire — defence in depth if the AES key leaks.</li>
+        </ul>
+        <p style="font-size: 13px; color: var(--accent-dim); margin: 14px 0 0; line-height: 1.65;">
+          Full walkthrough at <a href="https://mantis-docs.privacykey.org/edge-deployment" target="_blank" rel="noopener">mantis-docs.privacykey.org/edge-deployment</a>.
+        </p>
+      </div>
+    </div>
+
+    <p class="note" style="margin-top: 28px;">
+      <span class="tag">[!] trade-offs</span>
+      No dashboard, no key list, no retry queue, no central audit log — the webhook receiver records everything. Anyone with the AES key can mint. Need any of those? Use <a href="#compare">mantis full</a>.
+    </p>
+  </div>
+</section>
+
+<!-- ─────────────────────────────────────────────────────────────────────
+     Docs hub — short list of outbound links. Full reference lives in the
+     README + the per-deployment guides; this is just the door.
+     ───────────────────────────────────────────────────────────────────── -->
+<section id="docs">
+  <div class="container">
+    <p class="kicker">read the manual</p>
+    <h2>Full documentation.</h2>
+    <p class="intro">
+      Everything's at
+      <a href="https://mantis-docs.privacykey.org/" target="_blank" rel="noopener">mantis-docs.privacykey.org</a>.
+      A few entry points below.
+    </p>
+
+    <ul class="doc-list">
+      <li>
+        <a href="https://mantis-docs.privacykey.org/" target="_blank" rel="noopener">
+          <span class="label"><span class="arrow">→</span><span class="name">mantis docs home</span><span class="desc">overview, API, file-key matrix, host-event installers, reliability internals</span></span>
+          <span class="ext">docs ↗</span>
+        </a>
+      </li>
+      <li>
+        <a href="https://github.com/privacykey/mantis/blob/main/cli/README.md" target="_blank" rel="noopener">
+          <span class="label"><span class="arrow">→</span><span class="name">CLI command reference</span><span class="desc">full command reference for the terminal client</span></span>
+          <span class="ext">github ↗</span>
+        </a>
+      </li>
+      <li>
+        <a href="https://mantis-docs.privacykey.org/deployment/tailscale" target="_blank" rel="noopener">
+          <span class="label"><span class="arrow">→</span><span class="name">Tailscale Funnel</span><span class="desc">expose a personal mantis via Tailscale Funnel — no domain required</span></span>
+          <span class="ext">docs ↗</span>
+        </a>
+      </li>
+      <li>
+        <a href="https://mantis-docs.privacykey.org/deployment/cloudflare" target="_blank" rel="noopener">
+          <span class="label"><span class="arrow">→</span><span class="name">Cloudflare Tunnel + Access</span><span class="desc">tunnel + Cloudflare Access SSO for the dashboard</span></span>
+          <span class="ext">docs ↗</span>
+        </a>
+      </li>
+      <li>
+        <a href="https://mantis-docs.privacykey.org/deployment/railway" target="_blank" rel="noopener">
+          <span class="label"><span class="arrow">→</span><span class="name">Railway · Fly · Render</span><span class="desc">one-click hosted long-running deploys</span></span>
+          <span class="ext">docs ↗</span>
+        </a>
+      </li>
+      <li>
+        <a href="#edge">
+          <span class="label"><span class="arrow">→</span><span class="name">mantis edge</span><span class="desc">stateless Cloudflare Worker — the URL is the database, the webhook receiver is the audit log</span></span>
+          <span class="ext">local</span>
+        </a>
+      </li>
+      <li>
+        <a href="./about.html">
+          <span class="label"><span class="arrow">→</span><span class="name">about mantis</span><span class="desc">why it exists, what it doesn't try to be, where it fits</span></span>
+          <span class="ext">local</span>
+        </a>
+      </li>
+      <li>
+        <a href="./docs.html">
+          <span class="label"><span class="arrow">→</span><span class="name">docs hub</span><span class="desc">curated index of every page worth bookmarking</span></span>
+          <span class="ext">local</span>
+        </a>
+      </li>
+    </ul>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="container">
+    <div class="footer-inner">
+      <div>
+        <p class="footer-brand">
+          <span class="mark" aria-hidden="true">◉</span>
+          <span class="wm">mantis</span>
+        </p>
+        <p class="footer-tag">
+          A self-hostable canary-token service. A
+          <a href="https://github.com/privacykey">privacykey</a> project.
+        </p>
+      </div>
+      <div class="footer-col">
+        <h4>product</h4>
+        <a href="#architecture">architecture</a><br />
+        <a href="#capabilities">capabilities</a><br />
+        <a href="#compare">full vs edge</a><br />
+        <a href="#edge">mantis edge</a><br />
+        <a href="./docs.html">docs</a>
+      </div>
+      <div class="footer-col">
+        <h4>source</h4>
+        <a href="https://github.com/privacykey/mantis" target="_blank" rel="noopener">github ↗</a><br />
+        <a href="https://github.com/privacykey/mantis/issues" target="_blank" rel="noopener">issues ↗</a><br />
+        <a href="https://github.com/privacykey" target="_blank" rel="noopener">privacykey org ↗</a>
+      </div>
+      <div class="footer-col">
+        <h4>this site</h4>
+        <a href="./about.html">about</a><br />
+        <a href="./privacy.html">privacy</a><br />
+        <a href="./legal.html">legal &amp; licences</a><br />
+        <a href="../llms.txt" target="_blank" rel="noopener">llms.txt ↗</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© <span id="year">2026</span> privacykey · MIT License</span>
+      <span class="runtime">
+        <span class="version">CLI v0.1.6 · full v0.1.1 · edge v0.1.3</span>
+        <span class="sep">·</span>
+        <!-- Build status — populated by assets/footer.js from a one-shot
+             fetch to api.github.com (cached 5min). Initial state is "na"
+             so the dot reads dim until a real result lands; if the fetch
+             fails the badge hides itself. -->
+        <a class="build na" data-build-status href="https://github.com/privacykey/mantis/actions" target="_blank" rel="noopener" aria-label="Latest GitHub Actions run">
+          <span class="dot">●</span> build · checking
+        </a>
+      </span>
+    </div>
+  </div>
+</footer>
+
+<!-- Year auto-fill — same tiny script as the family; never grows stale. -->
+<script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+
+<!-- Theme switcher wiring. Loaded before Three.js so its `mantis:theme-change`
+     listener (in mantis-terminal.js) is already registered if the user picks
+     a theme during boot. -->
+<script src="../assets/theme.js"></script>
+
+<!-- Footer + code-block enhancements: copy-to-clipboard handlers + live
+     GitHub Actions build status (fetched from api.github.com, cached 5min). -->
+<script src="../assets/footer.js"></script>
+
+<!-- Three.js bundle (self-hosted to keep CSP self-only) and the terminal +
+     globe controller. Loaded at the end of body so layout paints first. -->
+<script src="../assets/vendor/three.min.js"></script>
+<script src="../assets/mantis-terminal.js"></script>
+
+</body>
+</html>

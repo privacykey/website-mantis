@@ -1,0 +1,52 @@
+# mantis — robots.txt
+#
+# Strategy mirrored from privacykey/privacytracker:
+#  - allow general search-engine crawl (we want to be discoverable)
+#  - allow on-demand AI agents that cite their sources
+#  - block bulk training-data crawlers
+#
+# llms.txt is also published for cooperating agents that prefer a
+# pre-formatted summary — see /llms.txt.
+
+User-agent: *
+Allow: /
+
+# On-demand agents that cite (allow)
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+# Training-data crawlers (block)
+User-agent: GPTBot
+Disallow: /
+
+User-agent: ClaudeBot
+Disallow: /
+
+User-agent: anthropic-ai
+Disallow: /
+
+User-agent: CCBot
+Disallow: /
+
+User-agent: Google-Extended
+Disallow: /
+
+User-agent: Applebot-Extended
+Disallow: /
+
+User-agent: Bytespider
+Disallow: /
+
+User-agent: FacebookBot
+Disallow: /
+
+User-agent: Meta-ExternalAgent
+Disallow: /
+
+Sitemap: https://mantis.privacykey.org/sitemap.xml

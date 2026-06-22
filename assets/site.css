@@ -1,0 +1,1430 @@
+/* =========================================================================
+   mantis — amber-on-black CRT terminal theme.
+
+   Lineage: this is a sibling of privacykey/privacytracker. Same structural
+   bones (CSS-variable palette, sticky nav, focus-visible rings, skip link,
+   reduced-motion bailout, no-JS canvas hiding) but the body font is
+   monospace everywhere and the palette is single-channel amber instead of
+   the green+navy family. Think IBM 5151 — one phosphor, one mood.
+
+   Dark only by design — a CRT in a sunlit room isn't a useful aesthetic.
+   We still set color-scheme: dark so native UI (scrollbars, form controls)
+   render in matching colours.
+   ========================================================================= */
+
+:root {
+  color-scheme: dark;
+
+  /* Single accent ramp — the only meaningful colour on the page.
+     The default is mono: neutral white-on-near-black, the modern
+     Terminal.app look. Alternate themes (amber, green, cyan) below
+     rebind these same variable names — every other rule in the file
+     references them by name, so theme switching is a single attribute
+     flip on <html>. */
+  --accent:             #F5F5F4;
+  --accent-bright:      #FFFFFF;    /* hover / focus / cursor */
+  --accent-soft:        #B5B5B0;    /* secondary text */
+  --accent-dim:         #7A7A75;    /* tertiary text, low-emphasis labels */
+  --accent-line:        #2A2A2A;    /* default border */
+  --accent-line-strong: #444444;    /* hover/emphasis border */
+
+  /* Reserved alarm colour — fires when a tripwire trips. Used for the
+     red pulse on the globe and for [TRIP] log lines. We hold this
+     constant across themes so a red trip line is always red. */
+  --alarm:        #ff5a3c;
+  --alarm-dim:    #7a2a1a;
+
+  /* Backgrounds — three stops: page → raised → deepest. Re-themed per
+     [data-theme] below. */
+  --bg:           #0B0B0B;
+  --bg-soft:      #16161A;
+  --bg-deep:      #050505;
+  --bg-overlay:   rgba(11, 11, 11, 0.78);
+
+  /* Scanline overlay tint — picked off the accent ramp so the CRT
+     stripes look like the same phosphor breathing, not a foreign
+     yellow added on top of green. Per-theme overrides below. */
+  --scanline-color: rgba(245, 245, 244, 0.022);
+
+  /* Type scale + radius — terminals don't do round, but a hair of
+     softening makes interactive elements feel clickable without
+     breaking the aesthetic. */
+  --radius-sm: 2px;
+  --radius:    4px;
+  --radius-md: 6px;
+
+  /* Mono stack — the entire page lives here. Specified inline elsewhere
+     too so streaming HTML doesn't briefly fall back to sans. */
+  --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+
+  /* Focus ring — picks up the active --accent-bright so it reads as part
+     of whichever theme is on. Thicker than the family sites because
+     monospace at small sizes is harder to scan and benefits from a louder
+     cue. */
+  --focus-ring: var(--accent-bright);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   Theme variants — each [data-theme] block rebinds the --accent ramp,
+   the --bg stops, and --scanline-color. Every other rule in this file
+   already references those names, so a theme flip is a single attribute
+   change on <html> (handled by assets/theme.js + the pre-paint inline
+   bootstrap in each page <head>). --alarm stays constant across themes
+   so a [TRIP] line is always red, regardless of palette.
+
+   The default (no data-theme attribute) is mono — see :root above.
+   The amber/green/cyan blocks below are opt-in via the dropdown.
+   ───────────────────────────────────────────────────────────────────────── */
+
+/* Amber — IBM 5151. #FFB000 is the canonical phosphor tone; warm-tinted
+   near-black backgrounds so the amber doesn't look like it's floating
+   on cold blue. */
+:root[data-theme="amber"] {
+  --accent:             #FFB000;
+  --accent-bright:      #FFC840;
+  --accent-soft:        #b88114;
+  --accent-dim:         #855a05;
+  --accent-line:        #3d2a04;
+  --accent-line-strong: #5a3d04;
+  --bg:                 #0a0805;
+  --bg-soft:            #15100a;
+  --bg-deep:            #060403;
+  --bg-overlay:         rgba(10, 8, 5, 0.78);
+  --scanline-color:     rgba(255, 176, 0, 0.035);
+}
+
+/* Phosphor green — Apple ][ / VT100 / Wargames. Highest-contrast theme
+   because pure-green LEDs on black is a famously legible combination. */
+:root[data-theme="green"] {
+  --accent:             #33FF33;
+  --accent-bright:      #6CFF6C;
+  --accent-soft:        #1FB31F;
+  --accent-dim:         #0F7A0F;
+  --accent-line:        #0C4A0C;
+  --accent-line-strong: #166614;
+  --bg:                 #001500;
+  --bg-soft:            #002600;
+  --bg-deep:            #000A00;
+  --bg-overlay:         rgba(0, 10, 0, 0.78);
+  --scanline-color:     rgba(51, 255, 51, 0.04);
+}
+
+/* DEC VT220 cyan — cooler, slightly noisier than green. Reads like a
+   1980s nautical-blue terminal in a dim engineering room. */
+:root[data-theme="cyan"] {
+  --accent:             #67E8F9;
+  --accent-bright:      #A5F3FC;
+  --accent-soft:        #38AABF;
+  --accent-dim:         #196A80;
+  --accent-line:        #093A45;
+  --accent-line-strong: #135265;
+  --bg:                 #001020;
+  --bg-soft:            #001A30;
+  --bg-deep:            #000812;
+  --bg-overlay:         rgba(0, 8, 18, 0.78);
+  --scanline-color:     rgba(103, 232, 249, 0.045);
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+html { scroll-behavior: smooth; scroll-padding-top: 88px; }
+
+body {
+  font-family: var(--mono);
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--accent);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+
+  /* Subtle vertical-noise vignette so the page reads as a CRT and not
+     a flat dark panel. Single radial-gradient overlay applied via
+     ::before so it doesn't fight against any child stacking context.
+     Very subtle (5% alpha) — it should be felt, not seen. */
+  position: relative;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* CRT scanline overlay — pure decoration, sits above content but is
+   pointer-events:none so it never intercepts clicks. The 3px stripe
+   pattern is fine enough not to harm legibility but coarse enough to
+   read at a glance. Disabled under reduced-motion to avoid flicker
+   for users who've asked for stillness. */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image: repeating-linear-gradient(
+    0deg,
+    var(--scanline-color) 0px,
+    var(--scanline-color) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+  z-index: 9999;
+}
+@media (prefers-reduced-motion: reduce) {
+  body::after { background-image: none; }
+}
+
+img { display: block; max-width: 100%; }
+
+a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+  text-decoration-color: var(--accent-line-strong);
+  transition: color .12s ease, text-decoration-color .12s ease;
+}
+a:hover {
+  color: var(--accent-bright);
+  text-decoration-color: var(--accent-bright);
+}
+
+:focus { outline: none; }
+:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 3px;
+  border-radius: var(--radius-sm);
+}
+
+/* Skip link — mirrors the family's pattern. Hidden until focused. */
+.skip-link {
+  position: absolute; left: 12px; top: -48px;
+  display: inline-flex; align-items: center;
+  background: var(--accent); color: var(--bg) !important;
+  padding: 10px 14px; border-radius: var(--radius);
+  min-height: 44px; box-sizing: border-box;
+  font-weight: 700; font-size: 13px;
+  text-decoration: none;
+  z-index: 100;
+  transition: top .15s ease;
+}
+.skip-link:focus,
+.skip-link:focus-visible { top: 12px; outline: 2px solid var(--accent-bright); outline-offset: 2px; }
+
+.container { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
+
+/* ─────────────────────────────────────────────────────────────────────────
+   Nav — sticky, blurred, prompt-style brand. Visual rhyme with privacykey
+   nav (same 68px height, same 44px hit targets) but stripped of any
+   gradient / shadow. The brand wordmark uses `$ mantis` to set the
+   terminal tone before the page has finished loading.
+   ───────────────────────────────────────────────────────────────────────── */
+.nav {
+  position: sticky; top: 0; z-index: 40;
+  backdrop-filter: saturate(180%) blur(10px);
+  -webkit-backdrop-filter: saturate(180%) blur(10px);
+  background: var(--bg-overlay);
+  border-bottom: 1px solid var(--accent-line);
+}
+.nav-inner {
+  display: flex; align-items: center; justify-content: space-between;
+  height: 68px;
+}
+.nav-brand {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 6px 4px; min-height: 44px;
+  text-decoration: none;
+  color: var(--accent);
+}
+/* Brand mark — the concentric dot glyph (◉) before the wordmark. Sits
+   beside the type at the same font-size; coloured with --accent-bright
+   so it lifts off the bar without needing an animation. The .wm is the
+   plain wordmark. (The old .prompt and .cursor classes used a $ and a
+   blinking _ — retired in favour of a single steady glyph.) */
+.nav-brand .mark { color: var(--accent-bright); font-weight: 700; font-size: 17px; line-height: 1; }
+.nav-brand .wm { font-weight: 700; letter-spacing: 0; font-size: 17px; }
+
+.nav-links { display: flex; align-items: center; gap: 8px; }
+.nav-links a.nav-link-inline {
+  color: var(--accent-soft); font-weight: 500; font-size: 13px;
+  display: inline-flex; align-items: center;
+  min-height: 44px; padding: 0 12px;
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  text-decoration: none;
+  letter-spacing: 0.5px;
+  transition: color .12s ease, border-color .12s ease;
+}
+.nav-links a.nav-link-inline:hover {
+  color: var(--accent-bright);
+  border-color: var(--accent-line-strong);
+  text-decoration: none;
+}
+.nav-cta {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: transparent; color: var(--accent) !important;
+  padding: 9px 16px; border-radius: var(--radius);
+  font-weight: 700; font-size: 13px;
+  letter-spacing: 0.5px;
+  min-height: 44px; box-sizing: border-box;
+  border: 1px solid var(--accent);
+  white-space: nowrap;
+  text-decoration: none !important;
+  transition: background .12s ease, color .12s ease, border-color .12s ease;
+}
+.nav-cta:hover {
+  background: var(--accent); color: var(--bg) !important;
+  border-color: var(--accent-bright);
+}
+.nav-cta svg { width: 14px; height: 14px; }
+
+/* Theme switcher — sits in .nav-links. Native <select> styled to match
+   the nav buttons; underlying wiring lives in assets/theme.js. Pattern
+   mirrors privacykey's .lang-switcher (which is hidden in their current
+   build but stays in the codebase for future locales). Inline SVG icon
+   keeps us inside the self-only CSP — no external SVG fetch. */
+.theme-switcher {
+  position: relative;
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 0 28px 0 12px;
+  border: 1px solid var(--accent-line-strong);
+  background: transparent;
+  color: var(--accent-soft);
+  border-radius: var(--radius);
+  min-height: 44px;
+  font-family: var(--mono);
+  font-weight: 500;
+  font-size: 12px;
+  letter-spacing: 0.5px;
+  transition: border-color .12s ease, color .12s ease;
+}
+.theme-switcher:hover { color: var(--accent); border-color: var(--accent); }
+.theme-switcher svg { width: 14px; height: 14px; flex-shrink: 0; }
+.theme-switcher select {
+  appearance: none;
+  -webkit-appearance: none;
+  background: transparent;
+  border: 0;
+  color: inherit;
+  font: inherit;
+  font-family: inherit;
+  padding: 8px 0;
+  cursor: pointer;
+  outline: none;
+  min-width: 0;
+}
+.theme-switcher::after {
+  /* Custom dropdown caret — same geometry as the family's lang-switcher. */
+  content: "";
+  position: absolute; right: 12px; top: 50%;
+  width: 6px; height: 6px;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  transform: translateY(-70%) rotate(45deg);
+  pointer-events: none;
+}
+.theme-switcher:focus-within { outline: 2px solid var(--focus-ring); outline-offset: 2px; }
+/* Native option list (rendered by the browser, not us) needs explicit
+   colours because some platforms ignore inherited transparent backgrounds. */
+.theme-switcher select option { color: var(--accent); background: var(--bg-soft); }
+
+@media (max-width: 720px) {
+  .nav-links a.nav-link-inline { display: none; }
+  .theme-switcher { padding: 0 24px 0 10px; }
+  .theme-switcher select { font-size: 11px; }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   Hero — fake terminal + 3D wireframe globe. Two layered children:
+   .hero-globe (canvas, behind) and .hero-terminal (foreground panel).
+   ───────────────────────────────────────────────────────────────────────── */
+.hero {
+  position: relative;
+  border-bottom: 1px solid var(--accent-line);
+  padding: 56px 0 72px;
+  overflow: hidden;
+}
+.hero-globe {
+  position: absolute; inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  /* Vignette so the globe fades into hero edges rather than crashing
+     against the section border. The visible area is biased to the right
+     side because the globe itself is also shifted right in 3D space
+     (see mantis-terminal.js → updateOffset()) — both moves together so
+     the globe sits in the column to the right of the terminal panel,
+     not behind it. Wider ellipse + later transparent stop here than the
+     original so the off-centre globe doesn't catch the fade at its
+     visible edges. */
+  -webkit-mask-image: radial-gradient(ellipse 90% 90% at 78% 50%, #000 62%, transparent 100%);
+          mask-image: radial-gradient(ellipse 90% 90% at 78% 50%, #000 62%, transparent 100%);
+  opacity: 0.92;
+}
+/* On narrow viewports the terminal goes full-width and the globe falls
+   back to centred (handled in JS). Re-centre the mask to match so the
+   visible region tracks the geometry. */
+@media (max-width: 820px) {
+  .hero-globe {
+    -webkit-mask-image: radial-gradient(ellipse 85% 80% at 50% 50%, #000 55%, transparent 95%);
+            mask-image: radial-gradient(ellipse 85% 80% at 50% 50%, #000 55%, transparent 95%);
+    opacity: 0.75;
+  }
+}
+.hero-globe canvas { display: block; width: 100%; height: 100%; }
+@media (prefers-reduced-motion: reduce) { .hero-globe { display: none; } }
+.no-js .hero-globe { display: none; }
+
+.hero > .container { position: relative; z-index: 1; }
+
+.hero-meta {
+  font-size: 12px;
+  color: var(--accent-dim);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  margin: 0 0 8px;
+}
+.hero-meta .ok { color: var(--accent); }
+
+.hero h1 {
+  font-family: var(--mono);
+  font-size: clamp(36px, 5.4vw, 64px);
+  font-weight: 700;
+  letter-spacing: -1px;
+  margin: 8px 0 12px;
+  line-height: 1.05;
+  color: var(--accent);
+}
+.hero h1 .underline {
+  text-decoration: underline;
+  text-decoration-thickness: 3px;
+  text-decoration-color: var(--accent);
+  text-underline-offset: 6px;
+}
+.hero h1 .blink { animation: blink 1s steps(2, end) infinite; color: var(--accent-bright); }
+
+.hero .lede {
+  font-size: clamp(15px, 1.4vw, 17px);
+  color: var(--accent-soft);
+  max-width: 640px;
+  margin: 0 0 28px;
+  line-height: 1.7;
+}
+
+/* Terminal panel — bordered box, header strip with three faux window dots
+   rendered in amber (instead of mac red/yellow/green to stay in palette).
+   Inside, .term-body is the scrollback area; .term-input-line shows the
+   prompt + caret + a transparent input the user can type into. */
+.hero-terminal {
+  background: var(--bg-deep);
+  border: 1px solid var(--accent-line-strong);
+  border-radius: var(--radius);
+  max-width: 720px;
+  margin: 12px 0 28px;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 176, 0, 0.04),
+    0 0 24px -8px rgba(255, 176, 0, 0.18);
+  overflow: hidden;
+}
+.term-bar {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 14px;
+  background: var(--bg-soft);
+  border-bottom: 1px solid var(--accent-line);
+}
+.term-bar .dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--accent-line-strong);
+}
+.term-bar .dot.live { background: var(--accent); }
+.term-bar .title {
+  margin-left: 8px;
+  font-size: 12px;
+  color: var(--accent-soft);
+  letter-spacing: 1px;
+}
+.term-bar .right {
+  margin-left: auto;
+  font-size: 11px;
+  color: var(--accent-dim);
+  letter-spacing: 1px;
+}
+.term-body {
+  padding: 14px 16px 8px;
+  font-size: 13px;
+  line-height: 1.55;
+  min-height: 280px;
+  max-height: 380px;
+  overflow-y: auto;
+  /* Reserve the prompt line outside scrollback */
+}
+.term-body::-webkit-scrollbar { width: 8px; }
+.term-body::-webkit-scrollbar-thumb { background: var(--accent-line-strong); border-radius: 4px; }
+.term-body::-webkit-scrollbar-track { background: var(--bg-soft); }
+
+.term-line { white-space: pre-wrap; word-break: break-word; }
+.term-line + .term-line { margin-top: 2px; }
+.term-line .prompt { color: var(--accent-soft); margin-right: 6px; }
+.term-line .cmd    { color: var(--accent-bright); }
+.term-line .info   { color: var(--accent-soft); }
+.term-line .ok     { color: var(--accent); }
+.term-line .trip   { color: var(--alarm); }
+.term-line .dim    { color: var(--accent-dim); }
+
+.term-input-line {
+  display: flex; align-items: center;
+  padding: 8px 16px 14px;
+  border-top: 1px dashed var(--accent-line);
+  font-size: 13px;
+}
+.term-input-line .prompt { color: var(--accent-soft); margin-right: 8px; }
+.term-input {
+  flex: 1;
+  background: transparent;
+  border: 0;
+  outline: 0;
+  color: var(--accent-bright);
+  font-family: var(--mono);
+  font-size: 13px;
+  caret-color: var(--accent-bright);
+  padding: 0;
+}
+.term-input::placeholder { color: var(--accent-dim); }
+
+.term-fallback {
+  padding: 14px 16px;
+  font-size: 13px;
+  color: var(--accent-soft);
+}
+
+@keyframes blink {
+  0%, 49%   { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+
+.hero-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 8px; }
+.btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 12px 18px;
+  border-radius: var(--radius);
+  font-family: var(--mono);
+  font-weight: 700; font-size: 13px;
+  letter-spacing: 0.5px;
+  border: 1px solid transparent;
+  text-decoration: none !important;
+  transition: background .12s ease, color .12s ease, border-color .12s ease;
+}
+.btn-primary {
+  background: var(--accent); color: var(--bg) !important;
+  border-color: var(--accent);
+}
+.btn-primary:hover {
+  background: var(--accent-bright); color: var(--bg) !important;
+  border-color: var(--accent-bright);
+}
+.btn-ghost {
+  background: transparent; color: var(--accent) !important;
+  border-color: var(--accent-line-strong);
+}
+.btn-ghost:hover {
+  border-color: var(--accent);
+  color: var(--accent-bright) !important;
+}
+.btn svg { width: 14px; height: 14px; }
+
+/* ─────────────────────────────────────────────────────────────────────────
+   Sections — generic
+   ───────────────────────────────────────────────────────────────────────── */
+section { padding: 72px 0; border-bottom: 1px solid var(--accent-line); }
+section:last-of-type { border-bottom: 0; }
+
+.kicker {
+  display: inline-block;
+  font-size: 11px; letter-spacing: 3px; text-transform: uppercase;
+  color: var(--accent-soft);
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+.kicker::before { content: "// "; color: var(--accent-dim); }
+
+h2 {
+  font-family: var(--mono);
+  font-size: clamp(24px, 3vw, 34px);
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  margin: 0 0 12px;
+  color: var(--accent);
+}
+
+.intro {
+  color: var(--accent-soft);
+  max-width: 720px;
+  font-size: 15px;
+  line-height: 1.7;
+  margin: 4px 0 32px;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   Capabilities grid — each card is a terminal log entry with a small
+   tripped/armed status pill. Visual rhyme with the family's principles
+   grid but reskinned for the mantis vocabulary.
+   ───────────────────────────────────────────────────────────────────────── */
+.cap-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 8px;
+}
+@media (max-width: 720px) { .cap-grid { grid-template-columns: 1fr; } }
+
+.cap {
+  background: var(--bg-soft);
+  border: 1px solid var(--accent-line);
+  border-radius: var(--radius);
+  padding: 20px 22px;
+  transition: border-color .15s ease, transform .15s ease;
+}
+.cap:hover {
+  border-color: var(--accent-line-strong);
+  transform: translateY(-2px);
+}
+.cap-head {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 10px;
+}
+.cap-status {
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  padding: 3px 7px;
+  border-radius: var(--radius-sm);
+  background: rgba(255, 176, 0, 0.12);
+  color: var(--accent);
+  border: 1px solid var(--accent-line-strong);
+  font-weight: 700;
+}
+.cap-status.armed { color: var(--accent-bright); }
+.cap-id {
+  font-size: 11px;
+  color: var(--accent-dim);
+  letter-spacing: 1px;
+}
+.cap h3 {
+  margin: 0 0 6px;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: -0.2px;
+}
+.cap p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--accent-soft);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   Code blocks — quickstart. Bordered amber, faux prompt for shell lines.
+   Copy button is a static visual hint; the actual copy is via select-all.
+   ───────────────────────────────────────────────────────────────────────── */
+.code-wrap {
+  background: var(--bg-deep);
+  border: 1px solid var(--accent-line-strong);
+  border-radius: var(--radius);
+  margin: 16px 0;
+  overflow: hidden;
+}
+.code-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 8px 14px;
+  background: var(--bg-soft);
+  border-bottom: 1px solid var(--accent-line);
+  font-size: 11px;
+  letter-spacing: 1.5px;
+  color: var(--accent-soft);
+  text-transform: uppercase;
+}
+.code-head .lang { font-weight: 700; }
+.code-head .hint { color: var(--accent-dim); }
+pre.code-block {
+  margin: 0;
+  padding: 14px 16px;
+  font-family: var(--mono);
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--accent);
+  overflow-x: auto;
+  white-space: pre;
+}
+pre.code-block::-webkit-scrollbar { height: 8px; }
+pre.code-block::-webkit-scrollbar-thumb { background: var(--accent-line-strong); border-radius: 4px; }
+pre.code-block::-webkit-scrollbar-track { background: var(--bg-soft); }
+/* Prompt $ — visually marks shell lines, but must NOT travel to the
+   clipboard. user-select: none excludes it from drag-selections and
+   from Cmd+A in every browser that supports the property (Safari,
+   Chrome, Firefox, Edge — all current versions). Slight opacity tweak
+   reinforces "this is decoration, not part of the command" so users
+   intuit they can paste the command as-is. The matching copy button
+   handler in footer.js strips the prompt textually for visitors who
+   click the button instead of drag-selecting. */
+pre.code-block .p {
+  color: var(--accent-soft);
+  -webkit-user-select: none;
+     -moz-user-select: none;
+          user-select: none;
+  opacity: 0.55;
+}
+pre.code-block .c { color: var(--accent-dim); }  /* comment */
+pre.code-block .s { color: var(--accent-bright); } /* string emphasis */
+
+/* Copy button — lives in the .code-head right cluster alongside the
+   step hint. Lowercase mono so it reads as another line of terminal
+   chrome rather than a generic UI button. Flips to .copied for ~1.8s
+   after a successful clipboard write (handled in footer.js). */
+.code-head .head-right {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+}
+.code-copy {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--accent-soft);
+  background: transparent;
+  border: 1px solid var(--accent-line-strong);
+  border-radius: var(--radius-sm);
+  padding: 4px 10px;
+  min-height: 28px;
+  cursor: pointer;
+  transition: color .12s ease, border-color .12s ease, background .12s ease;
+}
+.code-copy:hover { color: var(--accent); border-color: var(--accent); }
+.code-copy:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2px; }
+.code-copy.copied {
+  color: var(--accent);
+  border-color: var(--accent);
+  background: rgba(255, 255, 255, 0.04);
+}
+.code-copy.failed {
+  color: var(--alarm);
+  border-color: var(--alarm);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   Inline note / warning admonition. Used under a code block to flag
+   defaults-with-implications (e.g. "/inbox is dev-only — disable before
+   you put this on the public internet"). Terminal-flavoured: the
+   leading [!] tag reads like a console warning rather than a generic
+   web "tip" callout. Left-bar in the accent colour gives it weight
+   without a saturated background fill — keeps the section quiet on the
+   page until you read it. Square corners (per the "no rounded corners
+   on single-sided borders" rule).
+   ───────────────────────────────────────────────────────────────────────── */
+.note {
+  margin: 14px 0 0;
+  padding: 10px 14px;
+  background: var(--bg-soft);
+  border: 1px solid var(--accent-line);
+  border-left: 2px solid var(--accent);
+  border-radius: 0;
+  font-size: 13px;
+  color: var(--accent-soft);
+  line-height: 1.7;
+}
+.note .tag {
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: 1px;
+  margin-right: 8px;
+}
+.note code {
+  font-family: var(--mono);
+  background: rgba(255, 255, 255, 0.04);
+  padding: 1px 5px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--accent-line);
+  color: var(--accent);
+  font-size: 12px;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   Steps list — quickstart phases (clone → up → mint → trigger). Uses
+   inline numbers in monospace rather than ::marker so we can pad them.
+   ───────────────────────────────────────────────────────────────────────── */
+.steps {
+  list-style: none;
+  margin: 0; padding: 0;
+  display: grid; gap: 14px;
+}
+.steps li {
+  display: grid;
+  grid-template-columns: 38px 1fr;
+  gap: 12px;
+  align-items: start;
+}
+.steps li .n {
+  font-weight: 700;
+  color: var(--accent-bright);
+  font-size: 13px;
+  padding-top: 1px;
+}
+.steps li .n::before { content: "["; color: var(--accent-soft); }
+.steps li .n::after  { content: "]"; color: var(--accent-soft); }
+.steps li h4 {
+  margin: 0 0 4px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--accent);
+}
+.steps li p {
+  margin: 0;
+  font-size: 13px;
+  color: var(--accent-soft);
+  line-height: 1.65;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   Architecture grid — the three-card overview of mantis's pieces (CLI,
+   full server, edge server). Visual rhyme with .cap (same shape and
+   bg-soft surface) so the page reads as one vocabulary, but with a
+   small "// role" tag at the top of each card so visitors learn the
+   role-vs-name distinction without us having to spell it out twice.
+   The .arch-snippet at the bottom is a one-line install/deploy command
+   for each piece — same style as code blocks elsewhere, just terser.
+   ───────────────────────────────────────────────────────────────────────── */
+.arch-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+  margin: 8px 0 12px;
+}
+@media (max-width: 920px) { .arch-grid { grid-template-columns: 1fr; } }
+.arch-card {
+  background: var(--bg-soft);
+  border: 1px solid var(--accent-line);
+  border-radius: var(--radius);
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  transition: border-color .15s ease, transform .15s ease;
+}
+.arch-card:hover { border-color: var(--accent-line-strong); transform: translateY(-2px); }
+.arch-tag {
+  display: block;
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--accent-dim);
+  margin-bottom: 4px;
+}
+.arch-card h3 {
+  margin: 0 0 12px;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: -0.3px;
+}
+.arch-card > p {
+  margin: 0 0 14px;
+  font-size: 13px;
+  line-height: 1.65;
+  color: var(--accent-soft);
+}
+.arch-card > p code {
+  font-family: var(--mono);
+  background: rgba(255, 255, 255, 0.04);
+  padding: 1px 5px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--accent-line);
+  color: var(--accent);
+  font-size: 12px;
+}
+.arch-points {
+  list-style: none;
+  margin: 0 0 16px;
+  padding: 0;
+  font-size: 13px;
+  color: var(--accent-soft);
+}
+.arch-points li {
+  position: relative;
+  padding-left: 16px;
+  margin-bottom: 6px;
+  line-height: 1.55;
+}
+.arch-points li::before {
+  content: "·";
+  position: absolute;
+  left: 4px;
+  color: var(--accent);
+  font-weight: 700;
+}
+.arch-snippet {
+  margin: auto 0 0;          /* pin to bottom of card if available height differs */
+  padding: 8px 12px;
+  background: var(--bg-deep);
+  border: 1px solid var(--accent-line);
+  border-radius: var(--radius-sm);
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--accent-bright);
+  overflow-x: auto;
+  white-space: nowrap;
+}
+.arch-snippet code {
+  font-family: inherit;
+  color: inherit;
+  background: transparent;
+  border: 0;
+  padding: 0;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   Compare table — side-by-side full vs edge on the front page. Three
+   columns: property label (left, dim), full value (mid), edge value
+   (right). Left column is intentionally muted so the eye reads down the
+   two value columns. Below 720px the table reshapes into per-row cards
+   (display: block on every cell) and the property label promotes to a
+   header above each pair.
+   ───────────────────────────────────────────────────────────────────────── */
+.compare-wrap {
+  margin-top: 8px;
+  /* Lets long values wrap inside the cell rather than forcing an
+     overflow scrollbar on the whole table at intermediate widths. */
+  overflow-x: auto;
+}
+.compare {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  font-size: 13px;
+  font-family: var(--mono);
+}
+.compare thead th {
+  text-align: left;
+  font-weight: 700;
+  color: var(--accent);
+  font-size: 14px;
+  padding: 14px 16px 12px;
+  border-bottom: 1px solid var(--accent-line-strong);
+  letter-spacing: -0.2px;
+}
+.compare thead th:first-child { width: 22%; }
+.compare tbody th {
+  text-align: left;
+  font-weight: 500;
+  color: var(--accent-dim);
+  padding: 14px 16px;
+  vertical-align: top;
+  font-size: 11px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+.compare tbody td {
+  padding: 14px 16px;
+  vertical-align: top;
+  color: var(--accent-soft);
+  line-height: 1.55;
+  border-left: 1px solid var(--accent-line);
+}
+.compare tbody tr {
+  border-bottom: 1px solid var(--accent-line);
+}
+.compare tbody tr:last-child { border-bottom: 0; }
+.compare tbody tr:hover {
+  background: var(--bg-soft);
+}
+.compare code {
+  font-family: var(--mono);
+  background: rgba(255, 255, 255, 0.04);
+  padding: 1px 5px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--accent-line);
+  color: var(--accent);
+  font-size: 12px;
+}
+/* Mobile reshape — below 720px the three-column grid would force
+   columns too narrow to read. Stack each row vertically with the
+   property promoted to a row header. data-label on each td drives a
+   small label-above-value pattern so visitors can still tell which
+   server each value belongs to. */
+@media (max-width: 720px) {
+  .compare, .compare thead, .compare tbody, .compare tr, .compare th, .compare td {
+    display: block;
+    width: 100%;
+  }
+  .compare thead { display: none; }
+  .compare tbody tr {
+    padding: 14px 0;
+    border-bottom: 1px solid var(--accent-line);
+  }
+  .compare tbody th {
+    color: var(--accent);
+    font-weight: 700;
+    font-size: 12px;
+    padding: 0 0 8px;
+    letter-spacing: 1.2px;
+  }
+  .compare tbody td {
+    border-left: 0;
+    padding: 4px 0 4px 14px;
+    position: relative;
+  }
+  .compare tbody td::before {
+    content: attr(data-label);
+    display: inline-block;
+    min-width: 56px;
+    color: var(--accent-dim);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-right: 10px;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   Stats grid — the four-tile "by the numbers" strip used on the edge
+   section. Big accent number on top, dim label underneath. Sits on the
+   same bg-soft tile as the capabilities so the section reads as a
+   continuation of the same surface vocabulary.
+   ───────────────────────────────────────────────────────────────────────── */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  margin: 24px 0 28px;
+}
+@media (max-width: 760px) { .stats { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 420px) { .stats { grid-template-columns: 1fr; } }
+.stat {
+  background: var(--bg-soft);
+  border: 1px solid var(--accent-line);
+  border-radius: var(--radius);
+  padding: 18px 18px 16px;
+}
+.stat .n {
+  display: block;
+  font-size: clamp(26px, 3.6vw, 34px);
+  font-weight: 700;
+  color: var(--accent-bright);
+  letter-spacing: -0.5px;
+  line-height: 1.1;
+}
+.stat .n .unit { color: var(--accent); font-size: 0.6em; margin-left: 2px; font-weight: 400; }
+.stat .label {
+  margin-top: 6px;
+  font-size: 11px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--accent-dim);
+}
+
+/* The edge section's two-column "where things run" board. Left side gets
+   a small architecture sketch (ASCII-ish), right side prose + bullets. */
+.edge-board {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  align-items: start;
+  margin-top: 8px;
+}
+@media (max-width: 820px) { .edge-board { grid-template-columns: 1fr; } }
+.edge-board ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--accent-soft);
+}
+.edge-board ul li {
+  padding-left: 18px;
+  position: relative;
+  margin-bottom: 8px;
+}
+.edge-board ul li::before {
+  content: "→";
+  position: absolute;
+  left: 0;
+  color: var(--accent);
+}
+.edge-board ul li code {
+  font-family: var(--mono);
+  background: var(--bg-soft);
+  padding: 1px 5px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--accent-line);
+  color: var(--accent);
+  font-size: 12px;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   Docs links — list of outbound documentation entries
+   ───────────────────────────────────────────────────────────────────────── */
+.doc-list {
+  list-style: none;
+  margin: 16px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+.doc-list li {
+  border: 1px solid var(--accent-line);
+  border-radius: var(--radius);
+  background: var(--bg-soft);
+  transition: border-color .12s ease;
+}
+.doc-list li:hover { border-color: var(--accent); }
+.doc-list a {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 18px;
+  text-decoration: none;
+  color: var(--accent);
+  font-size: 14px;
+  gap: 16px;
+}
+.doc-list a:hover { color: var(--accent-bright); }
+.doc-list .label .arrow { color: var(--accent-soft); margin-right: 8px; }
+.doc-list .label .name  { font-weight: 700; }
+.doc-list .label .desc  { color: var(--accent-soft); font-weight: 400; margin-left: 12px; font-size: 13px; }
+.doc-list .ext { font-size: 11px; color: var(--accent-dim); letter-spacing: 1px; }
+@media (max-width: 600px) {
+  .doc-list .label .desc { display: block; margin: 4px 0 0; }
+  .doc-list a { flex-direction: column; align-items: flex-start; }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   Privacy + legal pages — admonition callout, subprocessor cards,
+   dependency cards, SPDX licence blurbs. Visual rhyme with the rest of
+   the site (bg-soft surfaces, accent-line borders) but with shapes
+   purpose-built for the dense reference content these pages carry.
+   ───────────────────────────────────────────────────────────────────────── */
+
+/* "Data not collected" hero callout on privacy.html — small icon disc +
+   short reassurance, anchored at the top of the page so the conclusion
+   reads before the breakdown. */
+.callout-no-collect {
+  margin: 0 0 28px;
+  padding: 20px 22px;
+  border: 1px solid var(--accent-line-strong);
+  border-radius: var(--radius);
+  background: var(--bg-soft);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.callout-no-collect .tick {
+  width: 44px; height: 44px;
+  border: 2px solid var(--accent);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.callout-no-collect .tick svg {
+  width: 22px; height: 22px;
+  stroke: var(--accent);
+  fill: none;
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.callout-no-collect h3 {
+  margin: 0 0 4px;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--accent);
+}
+.callout-no-collect p {
+  margin: 0;
+  color: var(--accent-soft);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+/* Subprocessor cards — one per third-party endpoint, used on privacy.html.
+   Each card shows the endpoint, when it's called, what data crosses,
+   what comes back. Necessity chip (required / optional / on-demand) is
+   monochrome — colour goes to --alarm only when actually required. */
+.subproc-group { margin: 26px 0 8px; }
+.subproc-group > h3 {
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.2px;
+  margin: 0 0 4px;
+  color: var(--accent);
+}
+.subproc-group .group-sub {
+  font-size: 13px;
+  color: var(--accent-soft);
+  margin: 0 0 14px;
+  line-height: 1.65;
+}
+.subproc-card {
+  margin: 12px 0;
+  padding: 16px 18px;
+  border: 1px solid var(--accent-line);
+  border-radius: var(--radius);
+  background: var(--bg-soft);
+}
+.subproc-card .head {
+  display: flex; align-items: baseline; justify-content: space-between;
+  gap: 12px; flex-wrap: wrap;
+  margin-bottom: 4px;
+}
+.subproc-card h4 {
+  margin: 0;
+  font-size: 14px; font-weight: 700;
+  color: var(--accent);
+}
+.subproc-card .endpoint {
+  display: inline-block;
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--accent-bright);
+  background: var(--bg-deep);
+  border: 1px solid var(--accent-line);
+  padding: 3px 8px;
+  border-radius: var(--radius-sm);
+  margin: 6px 0 10px;
+  word-break: break-all;
+}
+.subproc-card dl {
+  display: grid;
+  grid-template-columns: 110px 1fr;
+  gap: 6px 14px;
+  margin: 6px 0 0;
+  font-size: 13px;
+}
+@media (max-width: 540px) {
+  .subproc-card dl { grid-template-columns: 1fr; gap: 2px 0; }
+  .subproc-card dt { margin-top: 8px; }
+}
+.subproc-card dt { font-weight: 700; color: var(--accent); font-size: 12px; letter-spacing: 0.3px; }
+.subproc-card dd { margin: 0; color: var(--accent-soft); line-height: 1.6; }
+.subproc-card dd code {
+  font-family: var(--mono);
+  background: rgba(255,255,255,0.04);
+  padding: 1px 5px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--accent-line);
+  color: var(--accent);
+  font-size: 12px;
+}
+.subproc-card .their-policy {
+  margin: 10px 0 0;
+  padding-top: 10px;
+  border-top: 1px dashed var(--accent-line);
+  font-size: 12px;
+}
+
+/* Necessity chip — monospace pill. Required pulls from --alarm only
+   because "you can't turn this off" is the one statement worth louder. */
+.nec-chip {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: var(--radius-sm);
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  border: 1px solid var(--accent-line);
+  color: var(--accent-soft);
+  background: var(--bg-deep);
+}
+.nec-chip.required { color: var(--alarm); border-color: var(--alarm-dim); }
+.nec-chip.optional { color: var(--accent-bright); border-color: var(--accent-line-strong); }
+
+/* Dependency cards — legal.html. Shorter than subproc cards (no dl),
+   each one carries the lib name + version chip, one-line usage,
+   and an outbound link row. */
+.license-blurb {
+  margin: 4px 0 18px;
+  padding: 12px 16px;
+  border-left: 2px solid var(--accent);
+  background: var(--bg-soft);
+  color: var(--accent-soft);
+  font-size: 13px;
+  line-height: 1.65;
+}
+.license-blurb a { color: var(--accent-bright); }
+.dep-card {
+  margin: 10px 0;
+  padding: 14px 18px;
+  border: 1px solid var(--accent-line);
+  border-radius: var(--radius);
+  background: var(--bg-soft);
+}
+.dep-card .head {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 6px;
+}
+.dep-card h3 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: -0.2px;
+}
+.dep-card .scope-chip {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  padding: 2px 7px;
+  border-radius: var(--radius-sm);
+  color: var(--accent-soft);
+  background: var(--bg-deep);
+  border: 1px solid var(--accent-line);
+}
+.dep-card .usage {
+  margin: 0 0 8px;
+  font-size: 13px;
+  color: var(--accent-soft);
+  line-height: 1.6;
+}
+.dep-card .links {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  margin: 0; padding-top: 8px;
+  border-top: 1px dashed var(--accent-line);
+  font-size: 12px;
+}
+.dep-card .links a { color: var(--accent-soft); white-space: nowrap; }
+.dep-card .links a:hover { color: var(--accent); }
+
+/* Last-updated foot-line shared by both pages — terminal timestamp vibe. */
+.meta-line {
+  margin-top: 40px;
+  padding-top: 18px;
+  border-top: 1px solid var(--accent-line);
+  font-size: 12px;
+  color: var(--accent-dim);
+  font-family: var(--mono);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   Prose page (about / docs body) — narrower, normal line-height,
+   monospace at body size but slightly relaxed.
+   ───────────────────────────────────────────────────────────────────────── */
+.prose {
+  max-width: 720px;
+  font-size: 15px;
+  line-height: 1.75;
+  color: var(--accent-soft);
+}
+.prose h1 {
+  font-family: var(--mono);
+  font-size: clamp(28px, 4vw, 40px);
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  color: var(--accent);
+  margin: 0 0 16px;
+}
+.prose h2 { margin-top: 36px; font-size: clamp(20px, 2.4vw, 24px); }
+.prose h3 { margin-top: 28px; font-size: 16px; color: var(--accent); }
+.prose p  { margin: 0 0 14px; }
+.prose ul { margin: 0 0 18px 18px; padding: 0; }
+.prose li { margin-bottom: 6px; }
+.prose code {
+  font-family: var(--mono);
+  background: var(--bg-soft);
+  padding: 1px 6px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--accent-line);
+  color: var(--accent);
+  font-size: 13px;
+}
+.prose a { color: var(--accent-bright); text-decoration-color: var(--accent-line-strong); }
+.prose a:hover { text-decoration-color: var(--accent-bright); }
+
+/* ─────────────────────────────────────────────────────────────────────────
+   Footer — same three-col shape as the family, but every byte monospace.
+   ───────────────────────────────────────────────────────────────────────── */
+footer {
+  padding: 48px 0 0;
+  color: var(--accent-soft);
+  font-size: 13px;
+  background: var(--bg-deep);
+  border-top: 1px solid var(--accent-line);
+}
+.footer-inner {
+  display: grid;
+  /* brand + three nav columns. 1.5fr on brand keeps the description's
+     line length comfortable; equal weights on the rest. Drops to 2-col
+     then 1-col below the breakpoints. */
+  grid-template-columns: 1.5fr 1fr 1fr 1fr;
+  gap: 32px;
+  align-items: start;
+}
+@media (max-width: 880px) { .footer-inner { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 540px) { .footer-inner { grid-template-columns: 1fr; } }
+.footer-brand { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+.footer-brand .mark { color: var(--accent-bright); font-weight: 700; }
+.footer-brand .wm { font-weight: 700; color: var(--accent); }
+.footer-tag { color: var(--accent-dim); font-size: 12px; max-width: 320px; line-height: 1.6; }
+.footer-col h4 {
+  font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--accent-dim); margin: 0 0 14px; font-weight: 700;
+}
+.footer-col h4::before { content: "// "; }
+.footer-col a {
+  display: inline-flex; align-items: center;
+  color: var(--accent-soft);
+  padding: 6px 0;
+  font-size: 13px;
+  text-decoration: none;
+  transition: color .12s ease;
+}
+.footer-col a:hover { color: var(--accent-bright); text-decoration: underline; text-underline-offset: 3px; }
+.footer-bottom {
+  margin-top: 36px;
+  padding: 18px 0 24px;
+  border-top: 1px solid var(--accent-line);
+  display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap;
+  font-size: 12px;
+  color: var(--accent-dim);
+}
+/* Right-of-footer block: version + live build status. populated by
+   assets/footer.js (fetches api.github.com once per session, cached
+   for 5 min in localStorage). When unreachable, footer.js hides the
+   build badge and leaves the version alone, so the footer always
+   reads cleanly even if GitHub is down or the repo doesn't exist
+   yet. */
+.footer-bottom .runtime {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  letter-spacing: 0.5px;
+}
+.footer-bottom .runtime .version { color: var(--accent-soft); }
+.footer-bottom .runtime .sep     { color: var(--accent-dim); }
+.footer-bottom .build {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.footer-bottom .build .dot {
+  font-size: 13px;
+  line-height: 1;
+  color: var(--accent-dim);
+}
+/* CI-passing green is held constant across themes — green-for-pass is
+   so universal in build-status UI that re-tinting it per palette would
+   confuse more than it harmonised. Same logic as --alarm. */
+.footer-bottom .build.ok   .dot { color: #4ade80; }
+.footer-bottom .build.fail .dot { color: var(--alarm); }
+.footer-bottom .build.run  .dot { color: var(--accent-bright); animation: blink 1.4s steps(2, end) infinite; }
+.footer-bottom .build.na   .dot { color: var(--accent-dim); }
+.footer-bottom .build a    { color: inherit; text-decoration: none; }
+.footer-bottom .build a:hover { color: var(--accent); }
+
+/* ─────────────────────────────────────────────────────────────────────────
+   Reduced motion — turn off animation, scanlines, transitions globally.
+   Mirrors the family's pattern.
+   ───────────────────────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  html { scroll-behavior: auto; }
+  .blink, .cursor { animation: none !important; }
+}

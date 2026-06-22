@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="en" dir="ltr" class="no-js">
+<head>
+  <meta charset="utf-8" />
+  <!-- Pre-paint bootstrap (no-js swap + theme restore). See /en/index.html
+       for the full rationale comment; behaviour is identical across pages. -->
+  <script>
+    (function () {
+      var d = document.documentElement;
+      d.classList.replace('no-js', 'js');
+      try {
+        var t = localStorage.getItem('mantis-theme');
+        if (t && ['amber','green','cyan','mono'].indexOf(t) >= 0 && t !== 'mono') {
+          d.setAttribute('data-theme', t);
+        }
+      } catch (e) {}
+    })();
+  </script>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; form-action 'self'; img-src 'self' data:; font-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; connect-src 'self' https://api.github.com; object-src 'none'" />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
+
+  <title>docs — mantis</title>
+  <meta name="description" content="Curated index of every mantis documentation page worth bookmarking — README, CLI reference, deployment guides, API surface." />
+  <meta name="application-name" content="mantis" />
+  <meta name="author" content="privacykey" />
+  <meta name="robots" content="index, follow" />
+  <meta name="theme-color" content="#0B0B0B" />
+  <meta name="color-scheme" content="dark" />
+  <link rel="canonical" href="https://mantis.privacykey.org/en/docs.html" />
+
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/favicon.svg" />
+  <link rel="icon" href="../favicon.ico" sizes="any" />
+  <link rel="manifest" href="../site.webmanifest" />
+
+  <link rel="stylesheet" href="../assets/site.css" />
+</head>
+<body>
+
+<a class="skip-link" href="#main">Skip to content</a>
+
+<nav class="nav" aria-label="Primary">
+  <div class="container nav-inner">
+    <a href="./index.html" class="nav-brand" aria-label="mantis home">
+      <span class="mark" aria-hidden="true">◉</span>
+      <span class="wm">mantis</span>
+    </a>
+    <div class="nav-links">
+      <a href="./index.html#capabilities" class="nav-link-inline">capabilities</a>
+      <a href="./index.html#compare" class="nav-link-inline">full vs edge</a>
+      <a href="./docs.html" class="nav-link-inline">docs</a>
+      <label class="theme-switcher" aria-label="Color theme">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="9"/>
+          <circle cx="12" cy="7"  r="1.2" fill="currentColor" stroke="none"/>
+          <circle cx="17" cy="13" r="1.2" fill="currentColor" stroke="none"/>
+          <circle cx="9"  cy="16" r="1.2" fill="currentColor" stroke="none"/>
+        </svg>
+        <select data-theme-select aria-label="Color theme">
+          <option value="mono">mono · modern</option>
+          <option value="amber">amber · IBM 5151</option>
+          <option value="green">phosphor · CRT</option>
+          <option value="cyan">cyan · DEC</option>
+        </select>
+      </label>
+      <a href="https://github.com/privacykey/mantis" class="nav-cta" target="_blank" rel="noopener">
+        github
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M7 17L17 7M17 7H8M17 7V16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+    </div>
+  </div>
+</nav>
+
+<main id="main">
+
+<section>
+  <div class="container">
+    <article class="prose" style="max-width: 820px;">
+      <p class="kicker">docs</p>
+      <h1>The full manual.</h1>
+      <p>
+        The canonical reference for mantis lives at
+        <a href="https://mantis-docs.privacykey.org/" target="_blank" rel="noopener">mantis-docs.privacykey.org</a>
+        — getting started, per-deployment guides, API surface, self-hosted app
+        recipes, reliability internals. This page is a curated index. Most
+        links below open the relevant page on the docs site; the CLI command
+        reference still lives in the repository.
+      </p>
+
+      <h2>Start here</h2>
+      <ul class="doc-list" style="list-style: none; margin: 0;">
+        <li><a href="https://mantis-docs.privacykey.org/" target="_blank" rel="noopener"><span class="label"><span class="arrow">→</span><span class="name">mantis docs home</span><span class="desc">the canonical overview — features, getting started, deployment options, API surface, reliability internals</span></span><span class="ext">docs ↗</span></a></li>
+        <li><a href="https://mantis-docs.privacykey.org/getting-started" target="_blank" rel="noopener"><span class="label"><span class="arrow">→</span><span class="name">getting started</span><span class="desc">install the CLI, pick a backend (full or edge), log in, and create your first key</span></span><span class="ext">docs ↗</span></a></li>
+        <li><a href="./index.html#compare"><span class="label"><span class="arrow">→</span><span class="name">full vs edge</span><span class="desc">side-by-side comparison of the two server shapes — shape, state, dashboard, API, mint path, hit history, retry queue</span></span><span class="ext">local</span></a></li>
+        <li><a href="./about.html"><span class="label"><span class="arrow">→</span><span class="name">about mantis</span><span class="desc">why it exists, what it doesn't try to be, where it fits</span></span><span class="ext">local</span></a></li>
+      </ul>
+
+      <h2>API &amp; CLI</h2>
+      <ul class="doc-list" style="list-style: none; margin: 0;">
+        <li><a href="https://mantis-docs.privacykey.org/api" target="_blank" rel="noopener"><span class="label"><span class="arrow">→</span><span class="name">HTTP API reference</span><span class="desc">/api/keys, /api/keys/:id/hits, /api/keys/:id/install, /status/:public_id, response kinds, webhook payload shape</span></span><span class="ext">docs ↗</span></a></li>
+        <li><a href="https://github.com/privacykey/mantis/blob/main/cli/README.md" target="_blank" rel="noopener"><span class="label"><span class="arrow">→</span><span class="name">CLI command reference</span><span class="desc">terminal client — mantis new, list, hits, watch, install, monitor, reset, login, cloudflare, edge keygen, edge mint, profile</span></span><span class="ext">github ↗</span></a></li>
+      </ul>
+
+      <h2>Key types</h2>
+      <ul class="doc-list" style="list-style: none; margin: 0;">
+        <li><a href="https://mantis-docs.privacykey.org/file-keys" target="_blank" rel="noopener"><span class="label"><span class="arrow">→</span><span class="name">file keys</span><span class="desc">.docx, .xlsx, .pptx, .pdf, .svg, .html, .md, .eml, .ics, .vcf, plus NFC label &amp; Apple Wallet pass — mechanism &amp; reader caveats</span></span><span class="ext">docs ↗</span></a></li>
+        <li><a href="https://mantis-docs.privacykey.org/honey-directory" target="_blank" rel="noopener"><span class="label"><span class="arrow">→</span><span class="name">honey directory</span><span class="desc">pre-baited 9-file zip for shared-drive deployment</span></span><span class="ext">docs ↗</span></a></li>
+        <li><a href="https://mantis-docs.privacykey.org/host-events" target="_blank" rel="noopener"><span class="label"><span class="arrow">→</span><span class="name">host-event keys</span><span class="desc">shell, sudo, login, boot, wake, network — twelve installers across macOS / Linux / Windows</span></span><span class="ext">docs ↗</span></a></li>
+        <li><a href="https://mantis-docs.privacykey.org/host-events" target="_blank" rel="noopener"><span class="label"><span class="arrow">→</span><span class="name">web-embed snippets</span><span class="desc">css-background canary &amp; js-clone-detector — catch stylesheet copies and phishing clones</span></span><span class="ext">docs ↗</span></a></li>
+      </ul>
+
+      <h2>Deployment</h2>
+      <ul class="doc-list" style="list-style: none; margin: 0;">
+        <li><a href="https://mantis-docs.privacykey.org/deployment/tailscale" target="_blank" rel="noopener"><span class="label"><span class="arrow">→</span><span class="name">Tailscale Funnel</span><span class="desc">personal mantis on a laptop or home server, works behind CGNAT, no domain needed</span></span><span class="ext">docs ↗</span></a></li>
+        <li><a href="https://mantis-docs.privacykey.org/deployment/cloudflare" target="_blank" rel="noopener"><span class="label"><span class="arrow">→</span><span class="name">Cloudflare Tunnel + Access</span><span class="desc">own domain, SSO for the dashboard, DDoS protection at the edge</span></span><span class="ext">docs ↗</span></a></li>
+        <li><a href="https://mantis-docs.privacykey.org/deployment/railway" target="_blank" rel="noopener"><span class="label"><span class="arrow">→</span><span class="name">Railway</span><span class="desc">set-and-forget hosting; worker runs natively</span></span><span class="ext">docs ↗</span></a></li>
+        <li><a href="https://mantis-docs.privacykey.org/deployment/" target="_blank" rel="noopener"><span class="label"><span class="arrow">→</span><span class="name">Fly.io · Render</span><span class="desc">two more long-running options — same shape as Railway</span></span><span class="ext">docs ↗</span></a></li>
+        <li><a href="https://mantis-docs.privacykey.org/deployment/edge-limits" target="_blank" rel="noopener"><span class="label"><span class="arrow">→</span><span class="name">edge-limits (rate-limit + WAF)</span><span class="desc">rate-limit + WAF guidance for public exposure across Tailscale, Cloudflare, Railway, Fly, and Render</span></span><span class="ext">docs ↗</span></a></li>
+        <li><a href="https://mantis-docs.privacykey.org/edge-deployment" target="_blank" rel="noopener"><span class="label"><span class="arrow">→</span><span class="name">mantis edge — deployment guide</span><span class="desc">stateless Cloudflare Worker: keygen → wrangler secret put → deploy → mint locally; key rotation; custom domains; CI</span></span><span class="ext">docs ↗</span></a></li>
+        <li><a href="./index.html#edge"><span class="label"><span class="arrow">→</span><span class="name">mantis edge — on this site</span><span class="desc">the elevator pitch: stateless Worker, URL is the database, the webhook receiver becomes the audit log</span></span><span class="ext">local</span></a></li>
+      </ul>
+
+      <h2>Integrations</h2>
+      <ul class="doc-list" style="list-style: none; margin: 0;">
+        <li><a href="https://mantis-docs.privacykey.org/uptime-kuma" target="_blank" rel="noopener"><span class="label"><span class="arrow">→</span><span class="name">Uptime Kuma</span><span class="desc">per-key status URL flips 200 → 503 on hit; Kuma fans out to 80+ channels</span></span><span class="ext">docs ↗</span></a></li>
+        <li><a href="https://mantis-docs.privacykey.org/self-hosted-apps" target="_blank" rel="noopener"><span class="label"><span class="arrow">→</span><span class="name">self-hosted app recipes</span><span class="desc">per-app recipes — Immich, Paperless, Joplin, Vaultwarden, Gitea, dashboards</span></span><span class="ext">docs ↗</span></a></li>
+      </ul>
+
+      <h2>Reliability &amp; operations</h2>
+      <ul class="doc-list" style="list-style: none; margin: 0;">
+        <li><a href="https://mantis-docs.privacykey.org/reliability" target="_blank" rel="noopener"><span class="label"><span class="arrow">→</span><span class="name">retry queue, dedupe, UA parsing</span><span class="desc">Postgres-backed retry queue · exponential backoff · per-key dedupe windows · ua-parser-js + bot labels</span></span><span class="ext">docs ↗</span></a></li>
+        <li><a href="https://mantis-docs.privacykey.org/operational-notes" target="_blank" rel="noopener"><span class="label"><span class="arrow">→</span><span class="name">operational notes</span><span class="desc">key hashing (SHA-256 — full-entropy, same as GitHub PATs), disabled-key behaviour, worker vs cron mode</span></span><span class="ext">docs ↗</span></a></li>
+      </ul>
+
+      <p style="margin-top: 40px; color: var(--accent-dim); font-size: 13px;">
+        <a href="./index.html">← back to the front page</a>
+      </p>
+    </article>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="container">
+    <div class="footer-inner">
+      <div>
+        <p class="footer-brand">
+          <span class="mark" aria-hidden="true">◉</span>
+          <span class="wm">mantis</span>
+        </p>
+        <p class="footer-tag">
+          A self-hostable canary-token service. A
+          <a href="https://github.com/privacykey">privacykey</a> project.
+        </p>
+      </div>
+      <div class="footer-col">
+        <h4>product</h4>
+        <a href="./index.html#architecture">architecture</a><br />
+        <a href="./index.html#capabilities">capabilities</a><br />
+        <a href="./index.html#compare">mantis full</a><br />
+        <a href="./index.html#edge">mantis edge</a><br />
+        <a href="./docs.html">docs</a>
+      </div>
+      <div class="footer-col">
+        <h4>source</h4>
+        <a href="https://github.com/privacykey/mantis" target="_blank" rel="noopener">github ↗</a><br />
+        <a href="https://github.com/privacykey/mantis/issues" target="_blank" rel="noopener">issues ↗</a><br />
+        <a href="https://github.com/privacykey" target="_blank" rel="noopener">privacykey org ↗</a>
+      </div>
+      <div class="footer-col">
+        <h4>this site</h4>
+        <a href="./about.html">about</a><br />
+        <a href="./privacy.html">privacy</a><br />
+        <a href="./legal.html">legal &amp; licences</a><br />
+        <a href="../llms.txt" target="_blank" rel="noopener">llms.txt ↗</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© <span id="year">2026</span> privacykey · MIT License</span>
+      <span class="runtime">
+        <span class="version">CLI v0.1.6 · full v0.1.1 · edge v0.1.3</span>
+        <span class="sep">·</span>
+        <a class="build na" data-build-status href="https://github.com/privacykey/mantis/actions" target="_blank" rel="noopener" aria-label="Latest GitHub Actions run">
+          <span class="dot">●</span> build · checking
+        </a>
+      </span>
+    </div>
+  </div>
+</footer>
+
+<script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+<script src="../assets/theme.js"></script>
+<script src="../assets/footer.js"></script>
+
+</body>
+</html>

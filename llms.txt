@@ -70,4 +70,4 @@ integration are all shipping.
 
 ## Canonical reference
 
-The full documentation site is the source of truth: https://mantis-docs.privacykey.org/
+The full documentation site is the source of truth: https://docs.mantis.privacykey.org/

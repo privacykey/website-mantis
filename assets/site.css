@@ -21,11 +21,11 @@
      rebind these same variable names — every other rule in the file
      references them by name, so theme switching is a single attribute
      flip on <html>. */
-  --accent:             #F5F5F4;
+  --accent:             #E8E8F2;
   --accent-bright:      #FFFFFF;    /* hover / focus / cursor */
-  --accent-soft:        #B5B5B0;    /* secondary text */
-  --accent-dim:         #7A7A75;    /* tertiary text, low-emphasis labels */
-  --accent-line:        #2A2A2A;    /* default border */
+  --accent-soft:        #A0A0B4;    /* secondary text */
+  --accent-dim:         #6E6E85;    /* tertiary text, low-emphasis labels */
+  --accent-line:        #242430;    /* default border */
   --accent-line-strong: #444444;    /* hover/emphasis border */
 
   /* Reserved alarm colour — fires when a tripwire trips. Used for the
@@ -36,15 +36,15 @@
 
   /* Backgrounds — three stops: page → raised → deepest. Re-themed per
      [data-theme] below. */
-  --bg:           #0B0B0B;
-  --bg-soft:      #16161A;
+  --bg:           #0B0B12;
+  --bg-soft:      #14141C;
   --bg-deep:      #050505;
-  --bg-overlay:   rgba(11, 11, 11, 0.78);
+  --bg-overlay:   rgba(11, 11, 18, 0.78);
 
   /* Scanline overlay tint — picked off the accent ramp so the CRT
      stripes look like the same phosphor breathing, not a foreign
      yellow added on top of green. Per-theme overrides below. */
-  --scanline-color: rgba(245, 245, 244, 0.022);
+  --scanline-color: rgba(232, 232, 242, 0.022);
 
   /* Type scale + radius — terminals don't do round, but a hair of
      softening makes interactive elements feel clickable without
@@ -1384,6 +1384,29 @@ footer {
   display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap;
   font-size: 12px;
   color: var(--accent-dim);
+}
+.footer-bottom { align-items: center; }
+
+/* Maker pill — footer credit chip linking to the maker's GitHub
+   profile. Injected by assets/footer.js so it ships everywhere the
+   footer does. Fixed void-dark colours across every [data-theme] so
+   the avatar always sits on the family ground. */
+.maker-pill {
+  display: inline-flex; align-items: center; gap: 9px;
+  padding: 6px 15px 6px 6px;
+  background: #14141C;
+  border: 1px solid #242430;
+  border-radius: 999px;
+  font-size: 13.5px;
+  color: #E8E8F2;
+  text-decoration: none;
+}
+.maker-pill:hover { border-color: #444444; text-decoration: none; }
+.maker-pill img {
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  border: 1px solid #242430;
+  display: block;
 }
 /* Right-of-footer block: version + live build status. populated by
    assets/footer.js (fetches api.github.com once per session, cached

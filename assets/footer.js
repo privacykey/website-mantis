@@ -1,7 +1,7 @@
 /**
  * mantis — footer & code-block enhancements.
  *
- * Two small jobs, both gracefully no-op when their targets aren't on
+ * Three small jobs, all gracefully no-op when their targets aren't on
  * the page (so this one file ships everywhere without conditionals
  * in the markup):
  *
@@ -19,6 +19,13 @@
  *     IP; the cache keeps us well under that. If the repo doesn't
  *     exist, the network fails, or the API returns no runs, the
  *     badge hides itself and the footer still reads cleanly.
+ *
+ *  3. the maker pill — a small credit chip appended to the footer
+ *     bottom bar, linking to the maker's GitHub profile. Rendered
+ *     here (rather than repeated in every page's markup) for the
+ *     same ship-everywhere reason as the build badge. The avatar is
+ *     served by GitHub (github.com redirects to
+ *     avatars.githubusercontent.com — both are allowed in img-src).
  *
  * Privacy note: by adding api.github.com to connect-src and fetching
  * on page load, the visitor's IP is exposed to GitHub. That's the
@@ -170,9 +177,47 @@
       });
   }
 
+  // ─── 3. Maker pill ───────────────────────────────────────────────
+  var MAKER = 'adamxweb';
+  var MAKER_URL = 'https://github.com/AdamXweb';
+  var MAKER_AVATAR = 'https://github.com/AdamXweb.png?size=128';
+
+  function setupMakerPill () {
+    var bar = document.querySelector('.footer-bottom');
+    if (!bar || bar.querySelector('.maker-pill')) return;
+
+    var pill = document.createElement('a');
+    pill.className = 'maker-pill';
+    pill.href = MAKER_URL;
+    pill.target = '_blank';
+    pill.rel = 'noopener';
+    pill.setAttribute('aria-label', 'Made by ' + MAKER + ' — GitHub profile (opens in new tab)');
+
+    var img = document.createElement('img');
+    img.src = MAKER_AVATAR;
+    img.alt = '';
+    img.width = 26;
+    img.height = 26;
+    img.loading = 'lazy';
+    img.decoding = 'async';
+
+    pill.appendChild(img);
+    pill.appendChild(document.createTextNode(MAKER));
+
+    // Sit between the © line and the runtime block so space-between
+    // keeps © flush left and version/build flush right.
+    var runtime = bar.querySelector('.runtime');
+    if (runtime) {
+      bar.insertBefore(pill, runtime);
+    } else {
+      bar.appendChild(pill);
+    }
+  }
+
   function init () {
     setupCopy();
     setupBuildStatus();
+    setupMakerPill();
   }
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);

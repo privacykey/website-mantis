@@ -6,6 +6,11 @@ tripwire keys. Mint a URL, get told when something fetches it.
 Static HTML. No framework, no build step. Point any static host at the
 repository root.
 
+Production is a Cloudflare Worker serving the repository root as static
+assets ([`wrangler.jsonc`](wrangler.jsonc)). Cloudflare Workers Builds is
+connected to this repository and deploys every push to `main` with
+`npx wrangler deploy`; `just deploy` does the same by hand.
+
 **Hostname:** `mantis.privacykey.org` *(DNS not configured yet)*
 
 Product documentation lives separately, at

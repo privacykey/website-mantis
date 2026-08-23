@@ -21,8 +21,8 @@
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; form-action 'self'; img-src 'self' data: https://github.com https://avatars.githubusercontent.com; font-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; connect-src 'self' https://api.github.com; object-src 'none'" />
   <meta name="referrer" content="strict-origin-when-cross-origin" />
 
-  <title>privacy — mantis</title>
-  <meta name="description" content="What this website does (and doesn't) with your data. No cookies, no analytics, no third-party trackers. Every outbound endpoint listed in full." />
+  <title>privacy · mantis</title>
+  <meta name="description" content="What this website does (and doesn't) with your data. No cookies, analytics, or third-party trackers. Every outbound endpoint listed in full." />
   <meta name="application-name" content="mantis" />
   <meta name="author" content="privacykey" />
   <meta name="robots" content="index, follow" />
@@ -82,8 +82,8 @@
       <h1>What this site does with your data.</h1>
 
       <p>
-        Short answer: nothing it doesn't have to. This page is the long
-        answer — every outbound request this website makes, what data
+        The short answer is nothing it doesn't have to. This page is the long
+        answer, listing every outbound request this website makes, what data
         crosses the wire, and how to make it quieter if you'd rather.
       </p>
 
@@ -93,14 +93,14 @@
         </div>
         <div>
           <h3>No personal data collected</h3>
-          <p>No cookies, no analytics, no fingerprinting, no third-party trackers. We don't run a server that records your visit.</p>
+          <p>No cookies, analytics, fingerprinting, or third-party trackers. We don't run a server that records your visit.</p>
         </div>
       </div>
 
       <h2>Third parties this website talks to</h2>
 
       <p>
-        Most of the site is static — HTML, CSS, a couple of small scripts,
+        Most of the site is static: HTML, CSS, a couple of small scripts,
         and Three.js for the 3D globe. None of that calls anywhere off our
         origin. There's exactly one outbound endpoint, listed below.
       </p>
@@ -115,13 +115,13 @@
 
         <div class="subproc-card">
           <div class="head">
-            <h4>GitHub — public REST API</h4>
+            <h4>GitHub public REST API</h4>
             <span class="nec-chip optional">Optional</span>
           </div>
           <code class="endpoint">api.github.com/repos/privacykey/mantis/actions/runs?per_page=1</code>
           <dl>
             <dt>When it runs</dt><dd>Once on first page load. Result is cached in <code>localStorage</code> for 5 minutes, so reloads and inter-page nav don't re-hit the API.</dd>
-            <dt>What we send</dt><dd>A standard unauthenticated <code>GET</code> request. Your IP, your User-Agent, and an <code>Accept</code> header — nothing else. No cookies, no identifiers.</dd>
+            <dt>What we send</dt><dd>A standard unauthenticated <code>GET</code> request. Your IP, your User-Agent, and an <code>Accept</code> header, and nothing else. No cookies or identifiers.</dd>
             <dt>What we receive</dt><dd>JSON describing the most recent workflow run: status, conclusion, timestamps. We use one of those fields to colour the build badge.</dd>
             <dt>How to disable</dt><dd>Block <code>api.github.com</code> in your browser, or use a content blocker. The badge will hide itself when the request fails; nothing else on the page depends on it.</dd>
           </dl>
@@ -133,13 +133,13 @@
 
       <ul>
         <li><strong>No cookies.</strong> The site sets none, reads none, and works fine in private-browsing mode with all storage cleared.</li>
-        <li><strong>No analytics.</strong> No Google Analytics, no Plausible, no Fathom, no in-house pixel. We don't count visits.</li>
+        <li><strong>No analytics.</strong> No Google Analytics, Plausible, Fathom, or in-house pixel. We don't count visits.</li>
         <li><strong>No third-party fonts, scripts, or images.</strong> Everything except the GitHub API call above is served from this origin.</li>
         <li><strong>No ads.</strong> There are no advertising networks, no remarketing pixels, and no affiliate links.</li>
         <li><strong>No social embeds.</strong> Twitter / X, YouTube, etc. all load tracking content; we don't embed any of them.</li>
       </ul>
 
-      <h2>localStorage — what stays in your browser</h2>
+      <h2>localStorage: what stays in your browser</h2>
 
       <p>
         Two small keys are written to <code>localStorage</code> on this
@@ -148,8 +148,8 @@
       </p>
 
       <ul>
-        <li><code>mantis-theme</code> — which colour theme (mono / amber / green / cyan) you picked from the dropdown, so the choice survives reloads. Default: <code>mono</code>.</li>
-        <li><code>mantis-build-status</code> — the cached GitHub Actions result, with a 5-minute TTL. Lets the footer paint instantly on inter-page nav without re-hitting the API.</li>
+        <li><code>mantis-theme</code>: which colour theme (mono / amber / green / cyan) you picked from the dropdown, so the choice survives reloads. Default: <code>mono</code>.</li>
+        <li><code>mantis-build-status</code>: the cached GitHub Actions result, with a 5-minute TTL. Lets the footer paint instantly on inter-page nav without re-hitting the API.</li>
       </ul>
 
       <h2>What mantis itself does (the software)</h2>
@@ -157,7 +157,7 @@
       <p>
         This site is marketing. The actual mantis software you'd install
         on your own infrastructure has a different threat model and a
-        different set of outbound calls — by definition, since the whole
+        different set of outbound calls, by definition, since the whole
         point of mantis is to receive HTTP requests and forward
         notifications.
       </p>
@@ -168,14 +168,14 @@
       </p>
 
       <ul>
-        <li>Inbound: a unique <code>/c/&lt;id&gt;</code> URL accepts hits from anywhere on the public internet (that's the canary trigger). The server records the hit's <code>IP</code>, <code>User-Agent</code>, headers, and timestamp into your Postgres.</li>
-        <li>Outbound: whatever notification destinations you configure — webhook, email, Slack, Discord, Teams, Home Assistant, or Uptime Kuma. Nothing else.</li>
+        <li>Inbound: hits arrive on a unique <code>/c/&lt;id&gt;</code> URL from anywhere on the public internet (that's the canary trigger). The server records the hit's <code>IP</code>, <code>User-Agent</code>, headers, and timestamp into your Postgres.</li>
+        <li>Outbound: whatever notification destinations you configure: webhook, email, Slack, Discord, Teams, Home Assistant, or Uptime Kuma. Nothing else.</li>
         <li>No telemetry phones home. mantis doesn't call privacykey, doesn't report version, doesn't ping for updates.</li>
       </ul>
 
       <p>
         For <a href="./index.html#edge">mantis edge</a> on Cloudflare
-        Workers, the same shape holds — but the data crosses Cloudflare's
+        Workers, the same shape holds, but the data crosses Cloudflare's
         infrastructure, so their privacy policy applies in addition to
         whatever you configure on top. Cloudflare sees your visitors'
         traffic the same way they would for any Worker.
@@ -233,8 +233,7 @@
         <h4>this site</h4>
         <a href="./about.html">about</a><br />
         <a href="./privacy.html">privacy</a><br />
-        <a href="./legal.html">legal &amp; licences</a><br />
-        <a href="../llms.txt" target="_blank" rel="noopener">llms.txt ↗</a>
+        <a href="./legal.html">legal &amp; licences</a>
       </div>
     </div>
     <div class="footer-bottom">

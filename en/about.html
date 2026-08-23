@@ -25,8 +25,8 @@
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; form-action 'self'; img-src 'self' data: https://github.com https://avatars.githubusercontent.com; font-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; connect-src 'self' https://api.github.com; object-src 'none'" />
   <meta name="referrer" content="strict-origin-when-cross-origin" />
 
-  <title>about — mantis</title>
-  <meta name="description" content="About mantis — a self-hostable canary-token service. Why it exists, what it doesn't try to be, where it fits." />
+  <title>about · mantis</title>
+  <meta name="description" content="About mantis, a self-hostable canary-token service. Why it exists, what it doesn't try to be, where it fits." />
   <meta name="application-name" content="mantis" />
   <meta name="author" content="privacykey" />
   <meta name="robots" content="index, follow" />
@@ -85,8 +85,8 @@
       <h1>A trap that calls home.</h1>
 
       <p>
-        mantis mints <em>canary tokens</em> — ordinary-looking URLs that sit
-        quietly inside files and systems and call home when something fetches
+        mantis mints <em>canary tokens</em>: ordinary-looking URLs that sit
+        inside files and systems and call home when something fetches
         them. Named for the praying mantis: still until provoked, fast when
         it isn't.
       </p>
@@ -106,14 +106,14 @@
         <li>Generates ten kinds of baited file (<code>.docx</code>, <code>.xlsx</code>, <code>.pptx</code>, <code>.pdf</code>, <code>.svg</code>, <code>.html</code>, <code>.md</code>, <code>.eml</code>, <code>.ics</code>, <code>.vcf</code>).</li>
         <li>Generates installers for twelve host events on macOS, Linux, and Windows.</li>
         <li>Generates CSS and JS web-embed snippets, NFC tags, and Apple Wallet passes.</li>
-        <li>Routes hits to webhook, email, Slack, Discord, Teams, or Home Assistant — or via Uptime Kuma to its 80+ channels.</li>
-        <li>Runs both ways: a hit can drive a Home Assistant action — flip a switch, fire a scene, or cut a VLAN.</li>
+        <li>Routes hits to webhook, email, Slack, Discord, Teams, or Home Assistant, or via Uptime Kuma to its 80+ channels.</li>
+        <li>Runs both ways: a hit can drive a Home Assistant action (flip a switch, fire a scene, or cut a VLAN).</li>
       </ul>
 
       <h2>What it doesn't try to be</h2>
       <p>
-        Not a SIEM. mantis turns a fetch of a unique URL into a notification —
-        that's the entire surface area. For correlation, dashboards across many
+        mantis isn't a SIEM. It turns a fetch of a unique URL into a notification,
+        and that is the entire surface area. For correlation, dashboards across many
         signals, or SOC workflows, point a real platform at mantis's webhooks.
       </p>
       <p>
@@ -125,9 +125,9 @@
 
       <h2>Three pieces</h2>
       <ul>
-        <li><strong>CLI</strong> — terminal client, mints keys and generates installers. <code>brew install privacykey/tap/mantis</code>.</li>
-        <li><strong>mantis full</strong> — self-hosted Next.js + Postgres with a dashboard and REST API. Docker, Railway, Fly, Render.</li>
-        <li><strong><a href="./index.html#edge">mantis edge</a></strong> — stateless Cloudflare Worker; the URL itself is an AES-encrypted blob, the webhook receiver is the audit log. Free tier covers personal use.</li>
+        <li><strong>CLI</strong>: terminal client, mints keys and generates installers. <code>brew install privacykey/tap/mantis</code>.</li>
+        <li><strong>mantis full</strong>: self-hosted Next.js + Postgres with a dashboard and REST API. Docker, Railway, Fly, Render.</li>
+        <li><strong><a href="./index.html#edge">mantis edge</a></strong>: stateless Cloudflare Worker; the URL itself is an AES-encrypted blob, the webhook receiver is the audit log. Free tier covers personal use.</li>
       </ul>
 
       <h2>Status</h2>
@@ -177,8 +177,7 @@
         <h4>this site</h4>
         <a href="./about.html">about</a><br />
         <a href="./privacy.html">privacy</a><br />
-        <a href="./legal.html">legal &amp; licences</a><br />
-        <a href="../llms.txt" target="_blank" rel="noopener">llms.txt ↗</a>
+        <a href="./legal.html">legal &amp; licences</a>
       </div>
     </div>
     <div class="footer-bottom">

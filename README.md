@@ -29,7 +29,6 @@ Product documentation lives separately, at
 │   ├── privacy.html        Data posture
 │   └── legal.html          MIT plus bundled third-party libraries
 ├── 404.html
-├── llms.txt                Preferred entry point for cooperating AI agents
 ├── robots.txt              Search engines welcome; training crawlers blocked
 ├── sitemap.xml
 ├── site.webmanifest
@@ -68,8 +67,6 @@ python3 -m http.server 4000
   including at the start of a sentence.
 - Feature claims must match the shipped product. Check mantis's README rather
   than the previous version of this page.
-- `llms.txt` is a factual summary for agents, not marketing copy. Keep its
-  feature list and the docs URL in step.
 
 ## Related
 

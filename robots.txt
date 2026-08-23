@@ -1,12 +1,6 @@
-# mantis — robots.txt
+# mantis robots.txt
 #
-# Strategy mirrored from privacykey/privacytracker:
-#  - allow general search-engine crawl (we want to be discoverable)
-#  - allow on-demand AI agents that cite their sources
-#  - block bulk training-data crawlers
-#
-# llms.txt is also published for cooperating agents that prefer a
-# pre-formatted summary — see /llms.txt.
+# Allow general search-engine crawl; block bulk training-data crawlers.
 
 User-agent: *
 Allow: /

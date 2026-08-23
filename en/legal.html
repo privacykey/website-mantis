@@ -19,7 +19,7 @@
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; form-action 'self'; img-src 'self' data: https://github.com https://avatars.githubusercontent.com; font-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; connect-src 'self' https://api.github.com; object-src 'none'" />
   <meta name="referrer" content="strict-origin-when-cross-origin" />
 
-  <title>legal &amp; licences — mantis</title>
+  <title>legal &amp; licences · mantis</title>
   <meta name="description" content="Open-source libraries bundled with mantis and used by this website, grouped by SPDX licence identifier, with a short note on how each is used and links to the source." />
   <meta name="application-name" content="mantis" />
   <meta name="author" content="privacykey" />
@@ -81,10 +81,10 @@
 
       <p>
         mantis is built on open-source software. This page lists the major
-        third-party libraries the project depends on — across the website
+        third-party libraries the project depends on, across the website
         you're reading, the <a href="./index.html#compare">mantis full</a>
         server, the <a href="./index.html#edge">mantis edge</a> Worker, and
-        the mantis CLI — grouped by SPDX licence identifier. Where the chip
+        the mantis CLI. They are grouped by SPDX licence identifier. Where the chip
         says <span class="scope-chip">site only</span>, the library is only
         used to render this marketing site; everything else is part of the
         mantis software you'd install.
@@ -106,7 +106,7 @@
       <!-- ──────────────── MIT ──────────────── -->
       <h2 id="mit">MIT licence</h2>
       <div class="license-blurb">
-        Permissive licence — use, modify, distribute, and sublicense freely,
+        Permissive licence: use, modify, distribute, and sublicense freely,
         provided the original copyright + licence notice is preserved.
         No warranty.
         <a href="https://opensource.org/license/mit" target="_blank" rel="noopener">Full licence text ↗</a>
@@ -117,7 +117,7 @@
           <h3>Next.js</h3>
           <span class="scope-chip">mantis full</span>
         </div>
-        <p class="usage">React framework from Vercel — App Router pages, server components, <code>/api/*</code> routes, build pipeline, and the dev server. The entire mantis full app is a Next.js project.</p>
+        <p class="usage">React framework from Vercel: App Router pages, server components, <code>/api/*</code> routes, build pipeline, and the dev server. The entire mantis full app is a Next.js project.</p>
         <p class="links">
           <a href="https://nextjs.org" target="_blank" rel="noopener">Website ↗</a>
           <a href="https://github.com/vercel/next.js" target="_blank" rel="noopener">Source ↗</a>
@@ -130,7 +130,7 @@
           <h3>React &amp; react-dom</h3>
           <span class="scope-chip">mantis full</span>
         </div>
-        <p class="usage">Core React library + DOM renderer. Powers every interactive surface in the dashboard — login, key list, key detail, the live hits feed, and the dev inbox.</p>
+        <p class="usage">Core React library + DOM renderer. Powers every interactive surface in the dashboard: login, key list, key detail, the live hits feed, and the dev inbox.</p>
         <p class="links">
           <a href="https://react.dev" target="_blank" rel="noopener">Website ↗</a>
           <a href="https://github.com/facebook/react" target="_blank" rel="noopener">Source ↗</a>
@@ -143,7 +143,7 @@
           <h3>Tailwind CSS</h3>
           <span class="scope-chip">mantis full</span>
         </div>
-        <p class="usage">Utility-first CSS framework. Drives all the styling in the dashboard — the key list, the detail page, the dev inbox viewer.</p>
+        <p class="usage">Utility-first CSS framework. Drives all the styling in the dashboard (the key list, the detail page, the dev inbox viewer).</p>
         <p class="links">
           <a href="https://tailwindcss.com" target="_blank" rel="noopener">Website ↗</a>
           <a href="https://github.com/tailwindlabs/tailwindcss" target="_blank" rel="noopener">Source ↗</a>
@@ -205,7 +205,7 @@
       <!-- ──────────────── Apache 2.0 ──────────────── -->
       <h2 id="apache">Apache licence 2.0</h2>
       <div class="license-blurb">
-        Permissive licence with an explicit patent grant — use, modify,
+        Permissive licence with an explicit patent grant: use, modify,
         distribute freely. Derivative works must carry the licence text +
         a NOTICE file and disclose state-of-the-changes.
         <a href="https://www.apache.org/licenses/LICENSE-2.0" target="_blank" rel="noopener">Full licence text ↗</a>
@@ -216,7 +216,7 @@
           <h3>Drizzle ORM</h3>
           <span class="scope-chip">mantis full</span>
         </div>
-        <p class="usage">Type-safe SQL query builder + migration runner. Talks to Postgres on mantis full. Schema lives in <code>src/db/</code>; migrations are committed under <code>src/db/migrations/</code>. (mantis edge is stateless and doesn't need an ORM — there's no database to talk to.)</p>
+        <p class="usage">Type-safe SQL query builder + migration runner. Talks to Postgres on mantis full. Schema lives in <code>src/db/</code>; migrations are committed under <code>src/db/migrations/</code>. (mantis edge is stateless and has no database, so it doesn't need an ORM.)</p>
         <p class="links">
           <a href="https://orm.drizzle.team" target="_blank" rel="noopener">Website ↗</a>
           <a href="https://github.com/drizzle-team/drizzle-orm" target="_blank" rel="noopener">Source ↗</a>
@@ -242,7 +242,7 @@
           <h3>workerd</h3>
           <span class="scope-chip">mantis edge</span>
         </div>
-        <p class="usage">Cloudflare's open-source Workers runtime — the same engine that runs the production mantis edge Worker. Also the local-dev backend for <code>wrangler dev</code>.</p>
+        <p class="usage">Cloudflare's open-source Workers runtime, the same engine that runs the production mantis edge Worker. Also the local-dev backend for <code>wrangler dev</code>.</p>
         <p class="links">
           <a href="https://github.com/cloudflare/workerd" target="_blank" rel="noopener">Source ↗</a>
           <a href="https://github.com/cloudflare/workerd/blob/main/LICENSE" target="_blank" rel="noopener">Licence ↗</a>
@@ -273,10 +273,10 @@
       <!-- ──────────────── Hosted services ──────────────── -->
       <h2 id="hosted">Hosted services (not bundled)</h2>
       <div class="license-blurb">
-        These aren't libraries you can vendor — they're Cloudflare's hosted
+        These aren't libraries you can vendor. They're Cloudflare's hosted
         platform. Listed here for completeness because mantis edge depends
         on them at runtime. Terms are governed by Cloudflare's own
-        agreements, not an open-source licence.
+        agreements rather than an open-source licence.
       </div>
 
       <div class="dep-card">
@@ -284,7 +284,7 @@
           <h3>Cloudflare Workers</h3>
           <span class="scope-chip">mantis edge</span>
         </div>
-        <p class="usage">The serverless platform mantis edge runs on. A single Worker handles the public trigger endpoint, decrypts the AES blob in the URL to recover the webhook destination, and forwards the hit. No D1, no KV, no Queues — the URL itself carries every byte of state the Worker needs.</p>
+        <p class="usage">The serverless platform mantis edge runs on. A single Worker handles the public trigger endpoint, decrypts the AES blob in the URL to recover the webhook destination, and forwards the hit. It uses no D1, KV, or Queues. The URL itself carries every byte of state the Worker needs.</p>
         <p class="links">
           <a href="https://developers.cloudflare.com/workers/" target="_blank" rel="noopener">Workers docs ↗</a>
           <a href="https://www.cloudflare.com/website-terms/" target="_blank" rel="noopener">Cloudflare terms ↗</a>
@@ -294,15 +294,15 @@
 
       <h2 id="completeness">A note on completeness</h2>
       <p>
-        The list above covers the major direct dependencies — the libraries
+        The list above covers the major direct dependencies, the libraries
         you'd notice if they disappeared. The full set, including
         transitive dependencies, lives in the lockfiles in the
         <a href="https://github.com/privacykey/mantis" target="_blank" rel="noopener">mantis repository</a>
         (<code>package-lock.json</code> for npm,
         <code>Cargo.lock</code> for any Rust components,
         <code>requirements.txt</code> for any Python tooling). If you spot
-        something missing here that should be called out — especially
-        anything with a copyleft or attribution-required licence — please
+        something missing here that should be called out, especially
+        anything with a copyleft or attribution-required licence, please
         <a href="https://github.com/privacykey/mantis/issues" target="_blank" rel="noopener">open an issue</a>
         and we'll add it.
       </p>
@@ -349,8 +349,7 @@
         <h4>this site</h4>
         <a href="./about.html">about</a><br />
         <a href="./privacy.html">privacy</a><br />
-        <a href="./legal.html">legal &amp; licences</a><br />
-        <a href="../llms.txt" target="_blank" rel="noopener">llms.txt ↗</a>
+        <a href="./legal.html">legal &amp; licences</a>
       </div>
     </div>
     <div class="footer-bottom">

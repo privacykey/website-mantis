@@ -20,11 +20,11 @@
  *     exist, the network fails, or the API returns no runs, the
  *     badge hides itself and the footer still reads cleanly.
  *
- *  3. the maker pill — a small credit chip appended to the footer
- *     bottom bar, linking to the maker's GitHub profile. Rendered
- *     here (rather than repeated in every page's markup) for the
- *     same ship-everywhere reason as the build badge. The avatar is
- *     served by GitHub (github.com redirects to
+ *  3. the maker credit — "made by adamxweb" appended inline to the
+ *     © line of the footer bottom bar, linking to the maker's GitHub
+ *     profile. Rendered here (rather than repeated in every page's
+ *     markup) for the same ship-everywhere reason as the build badge.
+ *     The 16px avatar is served by GitHub (github.com redirects to
  *     avatars.githubusercontent.com — both are allowed in img-src).
  *
  * Privacy note: by adding api.github.com to connect-src and fetching
@@ -177,47 +177,47 @@
       });
   }
 
-  // ─── 3. Maker pill ───────────────────────────────────────────────
+  // ─── 3. Maker credit ─────────────────────────────────────────────
   var MAKER = 'adamxweb';
   var MAKER_URL = 'https://github.com/AdamXweb';
-  var MAKER_AVATAR = 'https://github.com/AdamXweb.png?size=128';
+  var MAKER_AVATAR = 'https://github.com/AdamXweb.png?size=64';
 
-  function setupMakerPill () {
+  function setupMakerCredit () {
     var bar = document.querySelector('.footer-bottom');
-    if (!bar || bar.querySelector('.maker-pill')) return;
+    if (!bar || bar.querySelector('.maker')) return;
 
-    var pill = document.createElement('a');
-    pill.className = 'maker-pill';
-    pill.href = MAKER_URL;
-    pill.target = '_blank';
-    pill.rel = 'noopener';
-    pill.setAttribute('aria-label', 'Made by ' + MAKER + ' — GitHub profile (opens in new tab)');
+    // The © line is the first <span> of the bar; the credit joins it
+    // inline so it wraps with the copyright rather than as its own
+    // flex child.
+    var line = bar.querySelector('span');
+    if (!line) return;
+
+    var link = document.createElement('a');
+    link.className = 'maker';
+    link.href = MAKER_URL;
+    link.target = '_blank';
+    link.rel = 'noopener';
+    link.setAttribute('aria-label', 'made by ' + MAKER + ' — GitHub profile (opens in new tab)');
 
     var img = document.createElement('img');
     img.src = MAKER_AVATAR;
     img.alt = '';
-    img.width = 26;
-    img.height = 26;
+    img.width = 16;
+    img.height = 16;
     img.loading = 'lazy';
     img.decoding = 'async';
 
-    pill.appendChild(img);
-    pill.appendChild(document.createTextNode(MAKER));
+    link.appendChild(img);
+    link.appendChild(document.createTextNode(MAKER));
 
-    // Sit between the © line and the runtime block so space-between
-    // keeps © flush left and version/build flush right.
-    var runtime = bar.querySelector('.runtime');
-    if (runtime) {
-      bar.insertBefore(pill, runtime);
-    } else {
-      bar.appendChild(pill);
-    }
+    line.appendChild(document.createTextNode(' · made by '));
+    line.appendChild(link);
   }
 
   function init () {
     setupCopy();
     setupBuildStatus();
-    setupMakerPill();
+    setupMakerCredit();
   }
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);

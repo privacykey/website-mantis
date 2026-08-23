@@ -1385,29 +1385,12 @@ footer {
   font-size: 12px;
   color: var(--accent-dim);
 }
-.footer-bottom { align-items: center; }
-
-/* Maker pill — footer credit chip linking to the maker's GitHub
-   profile. Injected by assets/footer.js so it ships everywhere the
-   footer does. Fixed void-dark colours across every [data-theme] so
-   the avatar always sits on the family ground. */
-.maker-pill {
-  display: inline-flex; align-items: center; gap: 9px;
-  padding: 6px 15px 6px 6px;
-  background: #14141C;
-  border: 1px solid #242430;
-  border-radius: 999px;
-  font-size: 13.5px;
-  color: #E8E8F2;
-  text-decoration: none;
-}
-.maker-pill:hover { border-color: #444444; text-decoration: none; }
-.maker-pill img {
-  width: 26px; height: 26px;
-  border-radius: 50%;
-  border: 1px solid #242430;
-  display: block;
-}
+/* Maker credit — inline text credit inside the © line, injected by
+   assets/footer.js so it ships everywhere the footer does. Inherits
+   the line's colour and size; only a 16px avatar is added. */
+.maker { display: inline-flex; align-items: center; gap: 6px; color: inherit; text-decoration: none; vertical-align: -2px; white-space: nowrap; }
+.maker img { width: 16px; height: 16px; border-radius: 50%; border: 1px solid currentColor; opacity: .92; }
+.maker:hover { text-decoration: underline; text-underline-offset: 3px; }
 /* Right-of-footer block: version + live build status. populated by
    assets/footer.js (fetches api.github.com once per session, cached
    for 5 min in localStorage). When unreachable, footer.js hides the

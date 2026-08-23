@@ -41,7 +41,7 @@ Product documentation lives separately, at
 The hero and footer pin all three component versions:
 
 ```
-CLI v0.1.6 · full v0.1.1 · edge v0.1.3
+CLI v0.2.0 · full v0.1.1 · edge v0.1.3
 ```
 
 mantis versions its components independently, and nothing here fetches them at

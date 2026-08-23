@@ -1,0 +1,34 @@
+name: Release version
+
+# Keeps the CLI version in the footer, the hero line and version.json in
+# step with the mantis GitHub Releases. Hourly; commits only when a release
+# changed; deploys itself afterwards because a bot commit never triggers
+# deploy.yml. Details: privacykey/gh-workflows/docs/site-release-version.md
+#
+# full/edge markers stay on their hand-written values until full-v* /
+# edge-v* releases exist — the sync leaves a marker untouched when nothing
+# matches its glob.
+
+on:
+  schedule:
+    # :17 past the hour — on-the-hour schedules queue behind everyone else's.
+    - cron: '17 * * * *'
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/release-version.yml']
+
+concurrency:
+  group: release-version
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    uses: privacykey/gh-workflows/.github/workflows/site-release-version.yml@v1
+    with:
+      repo: privacykey/mantis
+      tags: cli=cli-v*,full=full-v*,edge=edge-v*
+    secrets: inherit

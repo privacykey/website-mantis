@@ -15,7 +15,7 @@ on:
     - cron: '17 * * * *'
   workflow_dispatch:
   push:
-    branches: [main, feat/release-version]  # feature branch: temporary, for the end-to-end run
+    branches: [main]
     paths: ['.github/workflows/release-version.yml']
 
 concurrency:
@@ -27,7 +27,7 @@ permissions:
 
 jobs:
   sync:
-    uses: privacykey/gh-workflows/.github/workflows/site-release-version.yml@feat/site-release-version
+    uses: privacykey/gh-workflows/.github/workflows/site-release-version.yml@v1
     with:
       repo: privacykey/mantis
       tags: cli=cli-v*,full=full-v*,edge=edge-v*

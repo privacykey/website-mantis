@@ -2,8 +2,8 @@ name: Release version
 
 # Keeps the CLI version in the footer, the hero line and version.json in
 # step with the mantis GitHub Releases. Hourly; commits only when a release
-# changed; deploys itself afterwards because a bot commit never triggers
-# deploy.yml. Details: privacykey/gh-workflows/docs/site-release-version.md
+# changed. Cloudflare Workers Builds deploys the commit from the push
+# webhook. Details: privacykey/gh-workflows/docs/site-release-version.md
 #
 # full/edge markers stay on their hand-written values until full-v* /
 # edge-v* releases exist — the sync leaves a marker untouched when nothing
@@ -31,4 +31,3 @@ jobs:
     with:
       repo: privacykey/mantis
       tags: cli=cli-v*,full=full-v*,edge=edge-v*
-    secrets: inherit

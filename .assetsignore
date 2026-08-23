@@ -10,6 +10,7 @@
 .github
 .gitignore
 .assetsignore
+wrangler.jsonc
 README.md
 LICENSE
 NOTICE

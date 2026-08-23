@@ -34,8 +34,8 @@
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; form-action 'self'; img-src 'self' data: https://github.com https://avatars.githubusercontent.com; font-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; connect-src 'self' https://api.github.com; object-src 'none'" />
   <meta name="referrer" content="strict-origin-when-cross-origin" />
 
-  <title>mantis — self-hostable canary-token service</title>
-  <meta name="description" content="mantis mints unique URLs you can hide in files, hosts, and websites. When something fetches one, you get notified — webhook, email, Slack, Discord, Teams, or Home Assistant. Self-hostable. API-first. Open source." />
+  <title>mantis · self-hostable canary-token service</title>
+  <meta name="description" content="mantis mints unique URLs you can hide in files, hosts, and websites. When something fetches one, you get notified by webhook, email, Slack, Discord, Teams, or Home Assistant. Self-hostable. API-first. Open source." />
   <meta name="application-name" content="mantis" />
   <meta name="keywords" content="canary token, honeytoken, honey token, mantis, tripwire, insider threat, leaked credentials, honeypot, self-hosted, webhook, slack, discord, ssh detection, file canary, privacykey" />
   <meta name="author" content="privacykey" />
@@ -64,14 +64,14 @@
   <!-- Open Graph + Twitter card. -->
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="mantis" />
-  <meta property="og:title" content="mantis — self-hostable canary-token service" />
-  <meta property="og:description" content="Mint a URL. Hide it in a file, a host, or a website. When something fetches it — you'll know who." />
+  <meta property="og:title" content="mantis · self-hostable canary-token service" />
+  <meta property="og:description" content="Mint a URL. Hide it in a file, a host, or a website. When something fetches it, mantis tells you who." />
   <meta property="og:url" content="https://mantis.privacykey.org/en/" />
   <meta property="og:locale" content="en_US" />
 
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="mantis — self-hostable canary-token service" />
-  <meta name="twitter:description" content="Mint a URL. Hide it in a file, a host, or a website. When something fetches it — you'll know who." />
+  <meta name="twitter:title" content="mantis · self-hostable canary-token service" />
+  <meta name="twitter:description" content="Mint a URL. Hide it in a file, a host, or a website. When something fetches it, mantis tells you who." />
 
   <script type="application/ld+json">
   {
@@ -81,7 +81,7 @@
     "applicationCategory": "SecurityApplication",
     "applicationSubCategory": "Canary token service",
     "operatingSystem": "Docker (Linux, macOS, Windows host)",
-    "description": "Self-hostable canary-token service. API-first. Mint unique URLs, hide them in files, hosts, and websites — get notified when something fetches one.",
+    "description": "Self-hostable canary-token service. API-first. Mint unique URLs, hide them in files, hosts, and websites, and get notified when something fetches one.",
     "url": "https://mantis.privacykey.org/",
     "downloadUrl": "https://github.com/privacykey/mantis",
     "softwareVersion": "0.2.0",
@@ -147,7 +147,7 @@
 
     <p class="lede">
       Mint a unique URL. Hide it. When something fetches it, mantis tells you
-      — via webhook, email, Slack, Discord, Teams, or Home Assistant.
+      via webhook, email, Slack, Discord, Teams, or Home Assistant.
     </p>
 
     <div class="hero-terminal" aria-label="Interactive mantis terminal demo">
@@ -165,7 +165,7 @@
         <noscript>
           <div class="term-fallback">
             <p>
-              This is a live demo terminal — but you've got JavaScript disabled,
+              This is a live demo terminal, but you've got JavaScript disabled,
               so it's currently quiet. With scripts on, this panel boots a mantis
               instance, runs <code>mantis new</code>, <code>mantis install</code>,
               and <code>mantis watch</code>, and streams simulated hits from a
@@ -248,7 +248,7 @@
         <span class="arch-tag">// stateless worker</span>
         <h3>mantis edge</h3>
         <p>
-          Stateless. One Cloudflare Worker, no database — the URL itself is
+          Stateless. One Cloudflare Worker, no database. The URL itself is
           the state.
         </p>
         <ul class="arch-points">
@@ -299,8 +299,8 @@
         </div>
         <h3>The honey directory</h3>
         <p>
-          One zip, nine pre-baited files — salary spreadsheet, layoff PDF, fake
-          <code>passwords.txt</code>. A curious spelunker opens any of them
+          One zip, nine pre-baited files (salary spreadsheet, layoff PDF, fake
+          <code>passwords.txt</code>). A curious spelunker opens any of them
           and the same key fires.
         </p>
       </article>
@@ -323,12 +323,12 @@
           <span class="cap-status armed">armed</span>
           <span class="cap-id">smart-home/01</span>
         </div>
-        <h3>Smart-home &amp; IoT — both ways</h3>
+        <h3>Smart-home &amp; IoT, both ways</h3>
         <p>
           Door opened. Lock unlocked. Person detected. Snippets for
           <code>Home Assistant</code> and <code>Scrypted</code> turn any
           automation event into a hit; a LAN watcher covers devices with no
-          webhooks. And it runs in reverse — a hit can post back to a Home
+          webhooks. It also runs in reverse. A hit can post back to a Home
           Assistant webhook to flip a switch, fire a scene, or cut a VLAN.
         </p>
       </article>
@@ -354,8 +354,8 @@
         <h3>Tapped tags &amp; wallet passes</h3>
         <p>
           Write the URL to a blank NFC tag (NTAG213/215/216), or print a
-          QR/NFC sticker label. Or mint an Apple Wallet <code>.pkpass</code> —
-          its install, uninstall, and fetch callbacks each fire the key.
+          QR/NFC sticker label. Or mint an Apple Wallet <code>.pkpass</code>,
+          whose install, uninstall, and fetch callbacks each fire the key.
         </p>
       </article>
 
@@ -367,8 +367,8 @@
         <h3>Fan out through your existing alerting</h3>
         <p>
           Native: webhook, email, Slack, Discord, Teams, Home Assistant. Plus
-          a per-key status URL Uptime Kuma can watch — inherit its 80+ channels
-          (Telegram, ntfy, Matrix, Signal).
+          a per-key status URL Uptime Kuma can watch, which gives you its 80+
+          channels (Telegram, ntfy, Matrix, Signal).
         </p>
       </article>
 
@@ -380,7 +380,7 @@
         <h3>Quiet under load, loud when it matters</h3>
         <p>
           Dedupe window suppresses repeat-fire notifications. Postgres-backed
-          retry queue with exponential backoff. No Redis, no silent failures.
+          retry queue with exponential backoff. No Redis required, and nothing fails silently.
         </p>
       </article>
 
@@ -399,7 +399,7 @@
     <p class="kicker">choose your shape</p>
     <h2>Two servers. One CLI.</h2>
     <p class="intro">
-      Both servers are controlled by the same <code>mantis</code> binary —
+      Both servers are controlled by the same <code>mantis</code> binary:
       same install (<code>brew install privacykey/tap/mantis</code>), same
       command surface, same hit payload shape. The mint path is the only
       thing that differs.
@@ -427,7 +427,7 @@
           </tr>
           <tr>
             <th scope="row">dashboard</th>
-            <td data-label="full">Yes — <code>/keys</code>, <code>/login</code></td>
+            <td data-label="full">Yes (<code>/keys</code>, <code>/login</code>)</td>
             <td data-label="edge">None</td>
           </tr>
           <tr>
@@ -478,7 +478,7 @@
       <span style="color: var(--accent-dim);">// </span>
       Install + deploy walkthroughs at
       <a href="https://docs.mantis.privacykey.org/getting-started" target="_blank" rel="noopener">docs.mantis.privacykey.org/getting-started</a>.
-      Most teams run both — full for the dashboard, edge for hand-off URLs.
+      Most teams run both: full for the dashboard, edge for hand-off URLs.
     </p>
   </div>
 </section>
@@ -496,7 +496,7 @@
     <h2>mantis edge — the URL is the database.</h2>
     <p class="intro">
       One Cloudflare Worker, no database. The trigger URL itself is an
-      AES-encrypted blob carrying the webhook destination — on hit, the
+      AES-encrypted blob carrying the webhook destination. On hit, the
       Worker decrypts, forwards, and forgets. Your webhook receiver is
       the audit log.
     </p>
@@ -550,9 +550,9 @@
       <div>
         <h3 style="font-family: var(--mono); font-size: 16px; font-weight: 700; color: var(--accent); margin: 0 0 12px; letter-spacing: -0.2px;">how it works</h3>
         <ul>
-          <li><code>mantis edge mint</code> runs locally — the URL encodes the webhook, channel, and memo. No Worker round-trip.</li>
+          <li><code>mantis edge mint</code> runs locally. The URL encodes the webhook, channel, and memo, so there is no Worker round-trip.</li>
           <li>On hit, the Worker decrypts and forwards. Formats for <code>slack</code> / <code>discord</code> / <code>teams</code> if requested.</li>
-          <li><code>MANTIS_EDGE_WEBHOOK_ALLOWLIST</code> restricts where URLs can fire — defence in depth if the AES key leaks.</li>
+          <li><code>MANTIS_EDGE_WEBHOOK_ALLOWLIST</code> restricts where URLs can fire, as defence in depth if the AES key leaks.</li>
         </ul>
         <p style="font-size: 13px; color: var(--accent-dim); margin: 14px 0 0; line-height: 1.65;">
           Full walkthrough at <a href="https://docs.mantis.privacykey.org/edge-deployment" target="_blank" rel="noopener">docs.mantis.privacykey.org/edge-deployment</a>.
@@ -562,7 +562,7 @@
 
     <p class="note" style="margin-top: 28px;">
       <span class="tag">[!] trade-offs</span>
-      No dashboard, no key list, no retry queue, no central audit log — the webhook receiver records everything. Anyone with the AES key can mint. Need any of those? Use <a href="#compare">mantis full</a>.
+      There is no dashboard, key list, retry queue, or central audit log. The webhook receiver records everything. Anyone with the AES key can mint. If you need any of those, use <a href="#compare">mantis full</a>.
     </p>
   </div>
 </section>
@@ -596,7 +596,7 @@
       </li>
       <li>
         <a href="https://docs.mantis.privacykey.org/deployment/tailscale" target="_blank" rel="noopener">
-          <span class="label"><span class="arrow">→</span><span class="name">Tailscale Funnel</span><span class="desc">expose a personal mantis via Tailscale Funnel — no domain required</span></span>
+          <span class="label"><span class="arrow">→</span><span class="name">Tailscale Funnel</span><span class="desc">expose a personal mantis via Tailscale Funnel, no domain required</span></span>
           <span class="ext">docs ↗</span>
         </a>
       </li>
@@ -614,7 +614,7 @@
       </li>
       <li>
         <a href="#edge">
-          <span class="label"><span class="arrow">→</span><span class="name">mantis edge</span><span class="desc">stateless Cloudflare Worker — the URL is the database, the webhook receiver is the audit log</span></span>
+          <span class="label"><span class="arrow">→</span><span class="name">mantis edge</span><span class="desc">stateless Cloudflare Worker where the URL is the database and the webhook receiver is the audit log</span></span>
           <span class="ext">local</span>
         </a>
       </li>
@@ -667,8 +667,7 @@
         <h4>this site</h4>
         <a href="./about.html">about</a><br />
         <a href="./privacy.html">privacy</a><br />
-        <a href="./legal.html">legal &amp; licences</a><br />
-        <a href="../llms.txt" target="_blank" rel="noopener">llms.txt ↗</a>
+        <a href="./legal.html">legal &amp; licences</a>
       </div>
     </div>
     <div class="footer-bottom">

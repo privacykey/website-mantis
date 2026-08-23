@@ -15,7 +15,7 @@ on:
     - cron: '17 * * * *'
   workflow_dispatch:
   push:
-    branches: [main]
+    branches: [main, feat/release-version]  # feature branch: temporary, for the end-to-end run
     paths: ['.github/workflows/release-version.yml']
 
 concurrency:

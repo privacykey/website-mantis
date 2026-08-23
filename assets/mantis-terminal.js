@@ -478,7 +478,7 @@
   // the three-pieces framing on the architecture section above (CLI is
   // the controller; full and edge are the two server flavours).
   function bootBanner () {
-    writeLine([{ cls: 'dim', text: 'mantis CLI v0.1.6 — github.com/privacykey/mantis' }]);
+    writeLine([{ cls: 'dim', text: 'mantis CLI v0.2.0 — github.com/privacykey/mantis' }]);
     writeLine([{ cls: 'dim', text: '(c) privacykey · MIT · type ' }, { cls: 'ok', text: 'help' }, { cls: 'dim', text: ' for commands' }]);
     writeLine([{ cls: 'dim', text: '────────────────────────────────────────────────────' }]);
     writeLine([{ cls: 'info', text: '✓ connected to localhost:3000 ' }, { cls: 'dim', text: '(full · v0.1.1)' }]);

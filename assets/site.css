@@ -1391,6 +1391,11 @@ footer {
 .maker { display: inline-flex; align-items: center; gap: 6px; color: inherit; text-decoration: none; vertical-align: -2px; white-space: nowrap; }
 .maker img { width: 16px; height: 16px; border-radius: 50%; border: 1px solid currentColor; opacity: .92; }
 .maker:hover { text-decoration: underline; text-underline-offset: 3px; }
+/* Release version link in the © line — same treatment as the maker
+   credit. The text and href are rewritten by the site's release-version
+   workflow from the product's GitHub Releases (see version.json). */
+.footer-bottom a[data-release-link] { color: inherit; text-decoration: none; }
+.footer-bottom a[data-release-link]:hover { text-decoration: underline; text-underline-offset: 3px; }
 /* Right-of-footer block: version + live build status. populated by
    assets/footer.js (fetches api.github.com once per session, cached
    for 5 min in localStorage). When unreachable, footer.js hides the

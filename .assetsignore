@@ -1,0 +1,16 @@
+# Repository files that must not be served as part of the site.
+#
+# assets.directory is the repository root, so anything NOT listed here is
+# reachable over HTTP. wrangler has no default excludes of its own — .git/
+# included — so this list is the only thing keeping repository internals
+# off the air. .gh-workflows/ is where the deploy workflows check out the
+# shared actions; it must never be uploaded.
+.git/
+.gh-workflows/
+.github
+.gitignore
+.assetsignore
+README.md
+LICENSE
+NOTICE
+justfile

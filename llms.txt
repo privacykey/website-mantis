@@ -54,7 +54,7 @@ through the server's REST API) and `mantis edge mint …` for mantis edge
 
 ## Status
 
-Beta. MIT License. Independently versioned components: CLI v0.1.6, full
+Beta. MIT License. Independently versioned components: CLI v0.2.0, full
 server v0.1.1, edge v0.1.3. API surface, ten file formats plus NFC and Apple
 Wallet artifacts, twelve host installers, two web embeds, smart-home triggers
 and actions, the Postgres-backed webhook retry queue, and Uptime Kuma

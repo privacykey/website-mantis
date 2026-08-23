@@ -188,7 +188,10 @@
 
     // The © line is the first <span> of the bar; the credit joins it
     // inline so it wraps with the copyright rather than as its own
-    // flex child.
+    // flex child. The line already carries the release-version link
+    // (<a data-release-link="cli">, kept current by the release-version
+    // workflow at build time), so only ever append here — never replace
+    // the line's content, or that marker is lost.
     var line = bar.querySelector('span');
     if (!line) return;
 

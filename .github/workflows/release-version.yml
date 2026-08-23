@@ -27,7 +27,7 @@ permissions:
 
 jobs:
   sync:
-    uses: privacykey/gh-workflows/.github/workflows/site-release-version.yml@v1
+    uses: privacykey/gh-workflows/.github/workflows/site-release-version.yml@feat/site-release-version
     with:
       repo: privacykey/mantis
       tags: cli=cli-v*,full=full-v*,edge=edge-v*

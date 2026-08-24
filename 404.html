@@ -10,7 +10,7 @@
       d.classList.replace('no-js', 'js');
       try {
         var t = localStorage.getItem('mantis-theme');
-        if (t && ['amber','green','cyan','mono'].indexOf(t) >= 0 && t !== 'mono') {
+        if (t && ['amber','green','cyan','mono','ultraviolet','paper','rust'].indexOf(t) >= 0 && t !== 'mono') {
           d.setAttribute('data-theme', t);
         }
       } catch (e) {}
@@ -52,6 +52,9 @@
           <option value="amber">amber · IBM 5151</option>
           <option value="green">phosphor · CRT</option>
           <option value="cyan">cyan · DEC</option>
+          <option value="ultraviolet">ultraviolet · blacklight</option>
+          <option value="paper">paper · dot matrix</option>
+          <option value="rust">rust · oxide</option>
         </select>
       </label>
     </div>

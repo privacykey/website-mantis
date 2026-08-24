@@ -125,6 +125,61 @@
   --scanline-color:     rgba(103, 232, 249, 0.045);
 }
 
+/* Ultraviolet — blacklight violet. The most saturated dark option;
+   pairs the site's usual glow tricks with a colder, club-poster cast. */
+:root[data-theme="ultraviolet"] {
+  --accent:             #B48CFF;
+  --accent-bright:      #D4BCFF;
+  --accent-soft:        #8A64D0;
+  --accent-dim:         #5C3E96;
+  --accent-line:        #241448;
+  --accent-line-strong: #382066;
+  --bg:                 #0A0512;
+  --bg-soft:            #140A22;
+  --bg-deep:            #05020A;
+  --bg-overlay:         rgba(10, 5, 18, 0.78);
+  --scanline-color:     rgba(180, 140, 255, 0.045);
+}
+
+/* Paper — the one light theme: near-black ink on warm paper, dot-matrix
+   printout rather than glowing tube. Two deliberate departures:
+   scanlines read as paper grain, and --alarm is the ONE theme allowed
+   to rebind it — the shared #ff5a3c fails contrast on light ground
+   (~2.9:1), so Paper deepens it to keep a [TRIP] line legible. It is
+   still unmistakably red. */
+:root[data-theme="paper"] {
+  --accent:             #1A1814;
+  --accent-bright:      #000000;
+  --accent-soft:        #5A554C;
+  --accent-dim:         #8A847A;
+  --accent-line:        #DDD8CC;
+  --accent-line-strong: #C4BEB0;
+  --alarm:              #C13415;
+  --alarm-dim:          #DFA48F;
+  --bg:                 #F2EFE8;
+  --bg-soft:            #E9E5DA;
+  --bg-deep:            #FBF9F4;
+  --bg-overlay:         rgba(242, 239, 232, 0.78);
+  --scanline-color:     rgba(26, 24, 20, 0.03);
+}
+
+/* Rust — oxidised copper. Warmer than amber without drifting into the
+   alarm red: the ramp is tuned so a [TRIP] line still separates from
+   the accent (alarm sits redder and brighter than every rust stop). */
+:root[data-theme="rust"] {
+  --accent:             #E8935A;
+  --accent-bright:      #FFB07E;
+  --accent-soft:        #C06E48;
+  --accent-dim:         #8A4E2C;
+  --accent-line:        #301508;
+  --accent-line-strong: #48200E;
+  --bg:                 #100806;
+  --bg-soft:            #1C0F0A;
+  --bg-deep:            #080403;
+  --bg-overlay:         rgba(16, 8, 6, 0.78);
+  --scanline-color:     rgba(232, 147, 90, 0.04);
+}
+
 * { box-sizing: border-box; }
 html, body { margin: 0; padding: 0; }
 html { scroll-behavior: smooth; scroll-padding-top: 88px; }
@@ -417,8 +472,8 @@ a:hover {
   max-width: 720px;
   margin: 12px 0 28px;
   box-shadow:
-    inset 0 0 0 1px rgba(255, 176, 0, 0.04),
-    0 0 24px -8px rgba(255, 176, 0, 0.18);
+    inset 0 0 0 1px color-mix(in srgb, var(--accent) 4%, transparent),
+    0 0 24px -8px color-mix(in srgb, var(--accent) 18%, transparent);
   overflow: hidden;
 }
 .term-bar {
@@ -593,7 +648,7 @@ h2 {
   text-transform: uppercase;
   padding: 3px 7px;
   border-radius: var(--radius-sm);
-  background: rgba(255, 176, 0, 0.12);
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
   color: var(--accent);
   border: 1px solid var(--accent-line-strong);
   font-weight: 700;

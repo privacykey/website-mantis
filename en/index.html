@@ -493,7 +493,7 @@
 <section id="edge">
   <div class="container">
     <p class="kicker">stateless variant</p>
-    <h2>mantis edge — the URL is the database.</h2>
+    <h2>mantis edge: the URL is the database.</h2>
     <p class="intro">
       One Cloudflare Worker, no database. The trigger URL itself is an
       AES-encrypted blob carrying the webhook destination. On hit, the
@@ -539,7 +539,7 @@
 <span class="c"># 5. Tell the CLI which Worker to mint against; save the key locally.</span>
 <span class="p">$</span> mantis edge set-key https://mantis-edge.&lt;subdomain&gt;.workers.dev
 
-<span class="c"># 6. Mint a URL. No round-trip — the URL is generated locally.</span>
+<span class="c"># 6. Mint a URL. No round-trip: the URL is generated locally.</span>
 <span class="p">$</span> mantis edge mint \
     --worker https://mantis-edge.&lt;subdomain&gt;.workers.dev \
     --webhook https://hooks.slack.com/services/... \

@@ -62,13 +62,17 @@
           <circle cx="9"  cy="16" r="1.2" fill="currentColor" stroke="none"/>
         </svg>
         <select data-theme-select aria-label="Color theme">
-          <option value="mono">mono · modern</option>
-          <option value="amber">amber · IBM 5151</option>
-          <option value="green">phosphor · CRT</option>
-          <option value="cyan">cyan · DEC</option>
-          <option value="ultraviolet">ultraviolet · blacklight</option>
-          <option value="paper">paper · dot matrix</option>
-          <option value="rust">rust · oxide</option>
+          <optgroup label="dark">
+            <option value="mono">● mono · modern</option>
+            <option value="amber">● amber · IBM 5151</option>
+            <option value="green">● phosphor · CRT</option>
+            <option value="cyan">● cyan · DEC</option>
+            <option value="ultraviolet">● ultraviolet · blacklight</option>
+            <option value="rust">● rust · oxide</option>
+          </optgroup>
+          <optgroup label="light">
+            <option value="paper">○ paper · dot matrix</option>
+          </optgroup>
         </select>
       </label>
       <a href="https://github.com/privacykey/mantis" class="nav-cta" target="_blank" rel="noopener">

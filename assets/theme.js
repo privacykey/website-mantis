@@ -24,7 +24,7 @@
   // Order here mirrors the <option> order in the markup. The first
   // entry is also the page default (no data-theme attribute on <html>
   // means "use the bare :root block, which is mono").
-  var THEMES = ['mono', 'amber', 'green', 'cyan', 'ultraviolet', 'paper', 'rust'];
+  var THEMES = ['mono', 'amber', 'green', 'cyan', 'ultraviolet', 'rust', 'paper'];
   var DEFAULT_THEME = 'mono';
 
   function currentTheme () {

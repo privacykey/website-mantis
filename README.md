@@ -64,8 +64,10 @@ cover narrow screens, keyboard navigation, copy feedback, and the edge URL form.
 ## Keep facts current
 
 Release badges represent published, non-draft component tags in
-`privacykey/mantis`: `cli-v…`, `full-v…`, or `edge-v…`. A component without a tag is
-omitted. Package versions on `main` are not presented as published releases.
+`privacykey/mantis`: `cli-v…` for the CLI, a bare `v…` (or `full-v…`) for the full
+server — the convention the product's updating guide and the docs changelog use —
+and `edge-v…` for the edge worker. A component without a tag is omitted. Package
+versions on `main` are not presented as published releases.
 
 ```sh
 node scripts/sync-releases.mjs

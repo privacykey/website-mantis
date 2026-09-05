@@ -1,0 +1,33 @@
+<section><div class="container"><article class="prose">
+  <p class="kicker">accessibility</p>
+  <h1>Read and use mantis your way.</h1>
+  <h2 id="reading-settings">Reading settings</h2>
+  <p>Use your browser's zoom controls, or enlarge the text here. Reading view uses a simpler font, wider spacing, and one column. Your choices stay in this browser.</p>
+  <noscript><p>These optional settings need JavaScript. You can still use browser zoom, browser color settings, links, and the menu without it.</p></noscript>
+  <form class="reading-settings js-only" data-reading-settings novalidate aria-label="Reading settings">
+    <div class="field"><label for="reading-size">Text size</label><select id="reading-size" name="size"><option value="100">100% — standard size</option><option value="125">125%</option><option value="150">150%</option><option value="200">200% — double size</option></select></div>
+    <label class="check-option"><input type="checkbox" name="reading"> Reading view: simpler font, more space, one column</label>
+    <fieldset><legend>Your colors (optional)</legend>
+      <p id="reading-colors-help">Leave both fields blank to use the theme chosen in Menu. To use your own colors, enter a six-digit color code in each field. For example, #ffffff is white and #000000 is black. Choosing a theme in Menu clears these custom colors.</p>
+      <div class="field"><label for="reading-fg">Text color</label><input id="reading-fg" name="foreground" type="text" maxlength="7" placeholder="#ffffff" autocomplete="off" spellcheck="false" aria-describedby="reading-colors-help reading-colors-error"></div>
+      <div class="field"><label for="reading-bg">Background color</label><input id="reading-bg" name="background" type="text" maxlength="7" placeholder="#000000" autocomplete="off" spellcheck="false" aria-describedby="reading-colors-help reading-colors-error"></div>
+      <p class="form-error" id="reading-colors-error" role="alert"></p>
+    </fieldset>
+    <div class="actions"><button type="submit">Save reading settings</button><button type="button" data-reading-reset>Reset reading settings</button><button type="button" data-reading-undo disabled>Restore previous reading settings</button></div>
+    <p role="status" aria-atomic="true" data-reading-status></p>
+  </form>
+  <h2 id="keyboard">Use the site with a keyboard</h2>
+  <ul><li>Press <kbd>Tab</kbd> to move forward and <kbd>Shift</kbd> + <kbd>Tab</kbd> to move back. A visible outline marks your place.</li><li>The first link, <strong>Skip to content</strong>, moves past the repeated navigation.</li><li>Press <kbd>Enter</kbd> on links. Press <kbd>Enter</kbd> or <kbd>Space</kbd> on buttons and expandable sections.</li><li>Open <strong>Menu</strong> to reach all pages and color themes. Press <kbd>Escape</kbd> to close it. Moving to the next item outside the menu also closes it.</li><li>Use arrow keys in theme and text-size lists. Use arrow keys to scroll a focused transcript or wide table.</li><li>The demo accepts text commands. Type <code>help</code> and press <kbd>Enter</kbd> for examples. The same main actions are available as buttons.</li></ul>
+  <noscript><p>With JavaScript off, press Enter or Space on Menu again to close it. Escape and automatic closing need JavaScript.</p></noscript>
+  <h2 id="motion">Choose whether things move</h2>
+  <p>Animation starts off. On the homepage, select <strong>Animate demo</strong> to allow movement. Clear it to stop the globe. Use <strong>Skip animation</strong> during a replay to see the whole result at once. When your system requests reduced motion, animation stays off and the demo still works.</p>
+  <h2 id="reading-help">Understand the words</h2>
+  <p>Each page has a short summary in plain language. The <a href="/en/glossary.html">mantis glossary</a> explains technical words and abbreviations. Links open in the same tab unless you choose otherwise with your browser.</p>
+  <h2 id="accessibility-status">Accessibility status</h2>
+  <p>Our target is WCAG 2.2 Level AAA. WCAG means Web Content Accessibility Guidelines. This target covers this marketing website; the separate documentation site and Mantis software need their own reviews. Automated checks alone cannot prove full conformance.</p>
+  <p>We check text contrast, page structure, keyboard controls, reading settings, and narrow layouts. Testing with people who use assistive technology is still needed before making a formal AAA conformance claim.</p>
+  <h2 id="report-problem">Report an access problem</h2>
+  <p><a href="https://github.com/privacykey/website-mantis/issues">Report a website accessibility problem on GitHub</a>. Please include the page, what you tried to do, your browser, and any assistive technology you use. Do not include private information. GitHub may ask you to sign in.</p>
+  <h2 id="site-index">All website pages</h2>
+  <nav aria-label="Site index"><ul class="site-index">{{siteIndex}}</ul></nav>
+</article></div></section>

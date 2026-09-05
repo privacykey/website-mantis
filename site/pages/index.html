@@ -7,7 +7,7 @@
     <div class="hero-actions"><a class="btn btn-primary" href="https://docs.mantis.privacykey.org/getting-started/">Get started →</a><a class="btn btn-ghost" href="#compare">Compare full and edge</a></div>
     <p class="hero-guidance">A fetch is a signal to investigate. <a href="#compatibility">Check what triggers each format.</a></p>
     <div class="demo-layout">
-      <div class="hero-terminal" aria-label="Simulated mantis terminal">
+      <div class="hero-terminal" role="group" aria-label="Simulated mantis terminal">
         <div class="term-bar"><span class="dot live" aria-hidden="true"></span><span class="title">mantis · simulation</span><span class="right">local demo</span></div>
         <div class="term-body" tabindex="0" role="region" aria-label="Demo transcript">
           <div class="term-line">$ mantis new "Q4 forecast" -w https://hook.example.com/q4</div>
@@ -19,9 +19,9 @@
           <div class="term-line">[hit] demo-01 · 198.51.100.24</div>
           <div class="term-line">[simulation] Webhook alert delivered.</div>
         </div>
-        <form class="term-input-line js-only" aria-label="Try a demo command"><label class="sr-only" for="demo-command">Demo command</label><span class="prompt" aria-hidden="true">$</span><input id="demo-command" class="term-input" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Try mantis list"><button type="submit" class="demo-run">Run</button></form>
-        <div class="demo-controls js-only"><button type="button" data-demo-replay>Replay demo</button><button type="button" data-demo-skip hidden>Skip animation</button><button type="button" data-demo-command='mantis new "My demo key" -w https://hook.example.com/demo'>Create a key</button><button type="button" data-demo-command="mantis list">List keys</button><button type="button" data-demo-trigger>Simulate a fetch</button></div>
-        <p class="demo-disclaimer">Simulated keys and alerts. Commands stay in this page; nothing is installed or sent.</p>
+        <form class="term-input-line js-only" aria-label="Try a demo command"><label class="sr-only" for="demo-command">Demo command</label><span class="prompt" aria-hidden="true">$</span><input id="demo-command" aria-describedby="demo-help" class="term-input" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Try mantis list"><button type="submit" class="demo-run">Run</button></form>
+        <div class="demo-controls js-only"><label class="check-option"><input type="checkbox" data-demo-motion> Animate demo</label><button type="button" data-demo-replay>Replay demo</button><button type="button" data-demo-skip hidden>Skip animation</button><button type="button" data-demo-command='mantis new "My demo key" -w https://hook.example.com/demo'>Create a key</button><button type="button" data-demo-command="mantis list">List keys</button><button type="button" data-demo-trigger>Simulate a fetch</button></div>
+        <p id="demo-help" class="demo-disclaimer">Simulated keys and alerts. Type help for supported commands. Commands stay in this page; nothing is installed or sent.</p>
         <p class="sr-only" role="status" aria-live="polite" aria-atomic="true" data-demo-status></p>
       </div>
       <aside class="example-alert" aria-labelledby="alert-title">
@@ -172,8 +172,8 @@
     <p class="note">Choose full for a dashboard, delivery retries, and managed keys. Choose edge for self-contained URLs and webhook forwarding. <a href="https://docs.mantis.privacykey.org/getting-started/">Follow the setup guide →</a></p>
   </div>
 </section>
-<section id="edge"><div class="container"><p class="kicker">stateless variant</p><h2>Edge: the URL carries the configuration.</h2><p class="intro">One Cloudflare Worker decrypts each URL and forwards the hit to its webhook. No database, dashboard, retry queue, or central key list. Your receiver must store the events you need.</p><div class="edge-facts"><p><strong>No database to host.</strong> The URL contains the encrypted destination, channel, and memo.</p><p><strong>Plan limits apply.</strong> Cloudflare's free plan currently allows 100,000 requests per day and 10 ms of CPU time per request. End-to-end latency depends on the network and receiver. <a href="https://developers.cloudflare.com/workers/platform/limits/">Check current limits ↗</a></p></div>
-<details class="setup-guide"><summary>Deploy edge step by step</summary><div class="setup-content"><p>You'll need a Cloudflare account, the mantis CLI, Git, and the Node and pnpm versions specified by the product's <a href="https://github.com/privacykey/mantis/blob/main/.nvmrc">.nvmrc</a> and <a href="https://github.com/privacykey/mantis/blob/main/package.json">packageManager</a>. Run each step separately in the same terminal.</p>
+<section id="edge"><div class="container"><p class="kicker">stateless variant</p><h2>Edge: the URL carries the configuration.</h2><p class="intro">One Cloudflare Worker decrypts each URL and forwards the hit to its webhook. No database, dashboard, retry queue, or central key list. Your receiver must store the events you need.</p><div class="edge-facts"><p><strong>No database to host.</strong> The URL contains the encrypted destination, channel, and memo.</p><p><strong>Plan limits apply.</strong> Cloudflare's free plan currently allows 100,000 requests per day and 10 ms of CPU time per request. End-to-end latency depends on the network and receiver. <a href="https://developers.cloudflare.com/workers/platform/limits/">Check Cloudflare Worker limits ↗</a></p></div>
+<details class="setup-guide"><summary>Deploy edge step by step</summary><div class="setup-content"><p>You'll need a Cloudflare account, the mantis CLI, Git, and the Node and pnpm versions specified by the product's <a href="https://github.com/privacykey/mantis/blob/main/.nvmrc">Node version file (.nvmrc)</a> and <a href="https://github.com/privacykey/mantis/blob/main/package.json">pnpm version (packageManager)</a>. Run each step separately in the same terminal.</p>
 <div class="code-wrap"><div class="code-head"><span>1. Get the Worker</span><button class="code-copy" data-copy type="button">Copy 1. get the worker</button></div><pre class="code-block"><code>git clone https://github.com/privacykey/mantis.git
 cd mantis
 pnpm install --frozen-lockfile
@@ -193,51 +193,51 @@ cd mantis-edge</code></pre></div>
     <h2>Full documentation.</h2>
     <p class="intro">
       Everything's at
-      <a href="https://docs.mantis.privacykey.org/" target="_blank" rel="noopener">docs.mantis.privacykey.org</a>.
+      <a href="https://docs.mantis.privacykey.org/" rel="noopener">docs.mantis.privacykey.org</a>.
       A few entry points below.
     </p>
 
     <ul class="doc-list">
       <li>
-        <a href="https://docs.mantis.privacykey.org/" target="_blank" rel="noopener">
-          <span class="label"><span class="arrow">→</span><span class="name">mantis docs home</span><span class="desc">overview, API, file-key matrix, host-event installers, reliability internals</span></span>
+        <a href="https://docs.mantis.privacykey.org/" rel="noopener">
+          <span class="label"><span class="arrow" aria-hidden="true">→</span><span class="name">mantis docs home</span> <span class="desc">overview, API, file-key matrix, host-event installers, reliability internals</span></span>
           <span class="ext">docs ↗</span>
         </a>
       </li>
       <li>
-        <a href="https://docs.mantis.privacykey.org/cli/" target="_blank" rel="noopener">
-          <span class="label"><span class="arrow">→</span><span class="name">CLI command reference</span><span class="desc">full command reference for the terminal client</span></span>
+        <a href="https://docs.mantis.privacykey.org/cli/" rel="noopener">
+          <span class="label"><span class="arrow" aria-hidden="true">→</span><span class="name">CLI command reference</span> <span class="desc">full command reference for the terminal client</span></span>
           <span class="ext">docs ↗</span>
         </a>
       </li>
       <li>
-        <a href="https://docs.mantis.privacykey.org/deployment/tailscale" target="_blank" rel="noopener">
-          <span class="label"><span class="arrow">→</span><span class="name">Tailscale Funnel</span><span class="desc">expose a personal mantis via Tailscale Funnel, no domain required</span></span>
+        <a href="https://docs.mantis.privacykey.org/deployment/tailscale" rel="noopener">
+          <span class="label"><span class="arrow" aria-hidden="true">→</span><span class="name">Tailscale Funnel</span> <span class="desc">expose a personal mantis via Tailscale Funnel, no domain required</span></span>
           <span class="ext">docs ↗</span>
         </a>
       </li>
       <li>
-        <a href="https://docs.mantis.privacykey.org/deployment/cloudflare" target="_blank" rel="noopener">
-          <span class="label"><span class="arrow">→</span><span class="name">Cloudflare Tunnel + Access</span><span class="desc">tunnel + Cloudflare Access SSO for the dashboard</span></span>
+        <a href="https://docs.mantis.privacykey.org/deployment/cloudflare" rel="noopener">
+          <span class="label"><span class="arrow" aria-hidden="true">→</span><span class="name">Cloudflare Tunnel + Access</span> <span class="desc">tunnel + Cloudflare Access SSO for the dashboard</span></span>
           <span class="ext">docs ↗</span>
         </a>
       </li>
-      <li><a href="https://docs.mantis.privacykey.org/deployment/railway/"><span class="label"><span class="arrow">→</span><span class="name">Railway</span><span class="desc">Deploy the full server on Railway</span></span><span class="ext">docs ↗</span></a></li><li><a href="https://docs.mantis.privacykey.org/deployment/fly/"><span class="label"><span class="arrow">→</span><span class="name">Fly.io</span><span class="desc">Deploy the full server on Fly.io</span></span><span class="ext">docs ↗</span></a></li><li><a href="https://docs.mantis.privacykey.org/deployment/render/"><span class="label"><span class="arrow">→</span><span class="name">Render</span><span class="desc">Deploy the full server on Render</span></span><span class="ext">docs ↗</span></a></li>
+      <li><a href="https://docs.mantis.privacykey.org/deployment/railway/"><span class="label"><span class="arrow" aria-hidden="true">→</span><span class="name">Railway</span> <span class="desc">Deploy the full server on Railway</span></span><span class="ext">docs ↗</span></a></li><li><a href="https://docs.mantis.privacykey.org/deployment/fly/"><span class="label"><span class="arrow" aria-hidden="true">→</span><span class="name">Fly.io</span> <span class="desc">Deploy the full server on Fly.io</span></span><span class="ext">docs ↗</span></a></li><li><a href="https://docs.mantis.privacykey.org/deployment/render/"><span class="label"><span class="arrow" aria-hidden="true">→</span><span class="name">Render</span> <span class="desc">Deploy the full server on Render</span></span><span class="ext">docs ↗</span></a></li>
       <li>
         <a href="#edge">
-          <span class="label"><span class="arrow">→</span><span class="name">mantis edge</span><span class="desc">stateless Cloudflare Worker where the URL is the database and the webhook receiver is the audit log</span></span>
+          <span class="label"><span class="arrow" aria-hidden="true">→</span><span class="name">mantis edge</span> <span class="desc">stateless Cloudflare Worker where the URL is the database and the webhook receiver is the audit log</span></span>
           <span class="ext">local</span>
         </a>
       </li>
       <li>
         <a href="/en/about.html">
-          <span class="label"><span class="arrow">→</span><span class="name">about mantis</span><span class="desc">why it exists, what it doesn't try to be, where it fits</span></span>
+          <span class="label"><span class="arrow" aria-hidden="true">→</span><span class="name">about mantis</span> <span class="desc">why it exists, what it doesn't try to be, where it fits</span></span>
           <span class="ext">local</span>
         </a>
       </li>
       <li>
         <a href="/en/docs.html">
-          <span class="label"><span class="arrow">→</span><span class="name">docs hub</span><span class="desc">curated index of every page worth bookmarking</span></span>
+          <span class="label"><span class="arrow" aria-hidden="true">→</span><span class="name">docs hub</span> <span class="desc">curated index of every page worth bookmarking</span></span>
           <span class="ext">local</span>
         </a>
       </li>

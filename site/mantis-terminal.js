@@ -5,11 +5,10 @@ import { createDemo } from "/assets/demo-state.js";
  * Two cooperating systems:
  *
  *  1. Three.js wireframe globe (.hero-globe canvas)
- *     - perspective camera, slow auto-rotation
+ *     - perspective camera, optional slow rotation
  *     - latitude/longitude line cage rendered as LineSegments
- *     - on each "ping": a fake source IP is spawned at a random lat/lon,
- *       an arc grows from there toward the mantis core (the fixed marker
- *       on the globe), and a brief flash fires at the impact point.
+ *     - movement requires the unchecked-by-default Animate demo control;
+ *       simulated fetches do not produce flashes.
  *
  *  2. Local simulation (.hero-terminal DOM)
  *     - a complete transcript is visible before JavaScript loads;
@@ -17,7 +16,8 @@ import { createDemo } from "/assets/demo-state.js";
  *     - simulated fetches update the selected key's hit count.
  *
  *  Accessibility / perf:
- *   - Reduced motion disables the globe and makes Replay immediate.
+ *   - Animation is off by default. Reduced motion keeps it off and makes
+ *     Replay immediate, even if the visitor previously enabled animation.
  *     The transcript, input, and all demo controls remain usable.
  *   - Container is aria-hidden + pointer-events:none for the canvas.
  *   - DPR capped at 2, render paused when tab is hidden or hero is
@@ -329,6 +329,7 @@ import { createDemo } from "/assets/demo-state.js";
     var rafId = 0;
     var tabActive = !document.hidden;
     var inViewport = true;
+    var animated = false;
 
     // Where the globe sits horizontally inside the hero. On wide
     // viewports the terminal panel takes ~720px on the left side, so we
@@ -360,13 +361,14 @@ import { createDemo } from "/assets/demo-state.js";
       camera.aspect = w / h;
       camera.updateProjectionMatrix();
       updateOffset(w, h);
+      renderer.render(scene, camera);
     }
     resize();
     window.addEventListener('resize', resize);
     if (typeof ResizeObserver === 'function') new ResizeObserver(resize).observe(root);
 
     function tick (now) {
-      if (!tabActive || !inViewport) { rafId = 0; return; }
+      if (!animated || !tabActive || !inViewport) { rafId = 0; return; }
       var dt = Math.min(0.05, (now - lastFrame) / 1000);
       lastFrame = now;
 
@@ -382,7 +384,7 @@ import { createDemo } from "/assets/demo-state.js";
       rafId = requestAnimationFrame(tick);
     }
     function resume () {
-      if (rafId) return;
+      if (rafId || !animated) return;
       lastFrame = performance.now();
       rafId = requestAnimationFrame(tick);
     }
@@ -411,6 +413,10 @@ import { createDemo } from "/assets/demo-state.js";
       return r;
     };
     globe.regions = REGIONS;
+    globe.setAnimation = function(enabled) {
+      animated = enabled;
+      if(enabled) { resize(); resume(); } else pause();
+    };
     globe.destroy = function () {
       pause();
       window.removeEventListener('resize', resize);
@@ -430,6 +436,15 @@ import { createDemo } from "/assets/demo-state.js";
   var status = terminal.querySelector('[data-demo-status]');
   var replayButton = terminal.querySelector('[data-demo-replay]');
   var skipButton = terminal.querySelector('[data-demo-skip]');
+  var motionToggle = terminal.querySelector('[data-demo-motion]');
+  function animationEnabled() { return !!motionToggle && motionToggle.checked && !motion.matches; }
+  function updateAnimation() {
+    if(motionToggle) { motionToggle.disabled=motion.matches; if(motion.matches)motionToggle.checked=false; }
+    if(globeRoot)globeRoot.parentElement.dataset.motionEnabled=String(animationEnabled());
+    if(globe.setAnimation)globe.setAnimation(animationEnabled());
+  }
+  if(motionToggle)motionToggle.addEventListener('change',updateAnimation);
+  updateAnimation();
   var demo = createDemo();
   var replayId = 0;
   var playing = false;
@@ -454,6 +469,7 @@ import { createDemo } from "/assets/demo-state.js";
     terminal.querySelectorAll('input,button').forEach(function(el) { el.disabled = locked; });
     skipButton.disabled = false;
     skipButton.hidden = !locked;
+    if(motionToggle)motionToggle.disabled=locked || motion.matches;
     if (locked) skipButton.focus();
     else if (hadSkipFocus) replayButton.focus();
   }
@@ -467,7 +483,7 @@ import { createDemo } from "/assets/demo-state.js";
   }
   function trigger(userAction) {
     var lines = demo.trigger(); lines.forEach(write);
-    if (!motion.matches) globe.ping({alarmed:true});
+    // Keep the optional globe rotation calm; simulated hits never flash.
     if (userAction) announce(lines.join(' '));
   }
   var sequence = [
@@ -487,7 +503,7 @@ import { createDemo } from "/assets/demo-state.js";
     for (var i=0; i<sequence.length; i++) {
       if (id !== replayId) return;
       sequence[i]();
-      if (!motion.matches && i<sequence.length-1) await new Promise(function(resolve){setTimeout(resolve,1100);});
+      if (animationEnabled() && i<sequence.length-1) await new Promise(function(resolve){setTimeout(resolve,1100);});
     }
     if (id !== replayId) return;
     controls(false); announce('Demo complete. One key, one generated document, and one simulated hit.');
@@ -497,5 +513,5 @@ import { createDemo } from "/assets/demo-state.js";
   terminal.querySelectorAll('[data-demo-command]').forEach(function(button){button.addEventListener('click',function(){run(button.dataset.demoCommand,true);});});
   terminal.querySelector('[data-demo-trigger]').addEventListener('click',function(){trigger(true);});
   form.addEventListener('submit',function(e){e.preventDefault();if(playing)return;var command=input.value.trim().slice(0,500);input.value='';if(command)run(command,true);});
-  motion.addEventListener('change',function(e){if(e.matches){globe.destroy();if(playing){showCompleted();announce('Animation stopped for reduced motion.');}}});
+  motion.addEventListener('change',function(e){updateAnimation();if(e.matches && playing){showCompleted();announce('Animation stopped for reduced motion.');}});
 })();

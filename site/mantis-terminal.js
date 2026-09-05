@@ -1,4 +1,4 @@
-import { createDemo } from "/assets/demo-state.js?v=04d78b9ad991";
+import { createDemo } from "/assets/demo-state.js";
 /**
  * mantis — hero interaction layer.
  *

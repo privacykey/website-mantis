@@ -1,33 +1,26 @@
-name: Release version
-
-# Keeps the CLI version in the footer, the hero line and version.json in
-# step with the mantis GitHub Releases. Hourly; commits only when a release
-# changed. Cloudflare Workers Builds deploys the commit from the push
-# webhook. Details: privacykey/gh-workflows/docs/site-release-version.md
-#
-# full/edge markers stay on their hand-written values until full-v* /
-# edge-v* releases exist — the sync leaves a marker untouched when nothing
-# matches its glob.
-
+name: Release version check
 on:
   schedule:
-    # :17 past the hour — on-the-hour schedules queue behind everyone else's.
     - cron: '17 * * * *'
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths: ['.github/workflows/release-version.yml']
-
-concurrency:
-  group: release-version
-  cancel-in-progress: false
-
 permissions:
-  contents: write
-
+  contents: read
 jobs:
-  sync:
-    uses: privacykey/gh-workflows/.github/workflows/site-release-version.yml@v1
-    with:
-      repo: privacykey/mantis
-      tags: cli=cli-v*,full=full-v*,edge=edge-v*
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Prepare the latest tagged releases locally
+        run: node scripts/sync-releases.mjs
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+      - run: node scripts/check.mjs
+      - name: Report release drift for a reviewed update
+        run: |
+          if ! git diff --exit-code -- version.json en 404.html; then
+            echo 'Tagged releases changed. Run node scripts/sync-releases.mjs and submit the generated changes for review.'
+            exit 1
+          fi

@@ -1,7 +1,6 @@
-/* Generated from site/themes.json by scripts/build.mjs. */
 (function () {
   'use strict';
-  var themes = ["mono","amber","green","cyan","ultraviolet","rust","paper"];
+  var themes = THEME_IDS;
   var selects = document.querySelectorAll('[data-theme-select]');
   function current() { var t = document.documentElement.dataset.theme; return themes.includes(t) ? t : 'mono'; }
   function refresh() {

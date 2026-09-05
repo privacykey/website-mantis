@@ -29,7 +29,7 @@ export async function build({ check = false } = {}) {
   const themeBootstrap = `(function(){var d=document.documentElement;d.classList.replace('no-js','js');try{var t=localStorage.getItem('mantis-theme');if(${JSON.stringify(themeIds)}.includes(t))d.dataset.theme=t;}catch(e){}})();`;
   const values = { origin: config.origin, releases, themeOptions, themeBootstrap, reviewedAt: escape(config.reviewedAt), themeNames: themes.map(t=>escape(t.label)).join(', ') };
   values.navigation = render(await read('site/partials/navigation.html'), values);
-  values.footer = render(await read('site/partials/footer.html'), values);
+  const footerSource = await read('site/partials/footer.html');
   values.dependencyRows = dependencies.packages.map(p=>`<tr><th scope="row"><a href="${escape(p.metadataUrl)}">${escape(p.name)}</a></th><td data-label="Version">${escape(p.version)}</td><td data-label="Declared licence">${escape(p.license)}</td><td data-label="Used by">${escape(p.scopes.join(', '))}</td></tr>`).join('\n');
   values.dependencyRef = escape(dependencies.productRef);
   values.dependencyDate = escape(dependencies.checkedAt);
@@ -56,9 +56,8 @@ export async function build({ check = false } = {}) {
       return `<h2${attrs}>${text}</h2>`;
     });
     const toc=headings.length>2?`<details class="page-index"><summary>On this page</summary><nav class="page-toc" aria-label="On this page"><ul>${headings.map(h=>`<li><a href="#${h.id}">${h.name}</a></li>`).join('')}</ul></nav></details>`:'';
-    const help=`<p class="page-help"><a href="/en/glossary.html">Glossary</a> · <a href="/en/accessibility.html">Accessibility and reading settings</a></p>`;
-    const readingHelp=`<details class="plain-summary"><summary>Plain-language summary</summary><p>${escape(summaries[page.name])}</p></details>${help}${toc}`;
-    content=page.name==='index'?content.replace('<div class="demo-layout">',readingHelp+'<div class="demo-layout">'):content.replace('</h1>','</h1>'+readingHelp);
+    const readingGuide=`<details class="plain-summary"><summary>Plain-language summary</summary><p>${escape(summaries[page.name])}</p></details>${toc}`;
+    const footer=render(footerSource,{...values,readingGuide});
     // Standalone text links need a full-size target; inline prose links are exempt.
     content=content.replace(/<p><a (?!class=)/g,'<p><a class="standalone-link" ');
     // Preserve table semantics when small-screen or reading-view CSS stacks cells.
@@ -68,8 +67,8 @@ export async function build({ check = false } = {}) {
       return `<${tag}${attrs} role="${role}">`;
     });
     const label=({index:'Home',about:'About',docs:'Documentation',privacy:'Privacy',legal:'Licences',accessibility:'Accessibility',glossary:'Glossary','404':'Page not found'})[page.name];
-    const breadcrumbs=`<nav class="breadcrumbs container" aria-label="Breadcrumb"><ol>${page.name==='index'?'': '<li><a href="/en/">Home</a></li>'}<li><span aria-current="page">${label}</span></li></ol></nav>`;
-    const html = render(layout, { ...values, breadcrumbs, title: escape(page.title), description: escape(page.description), canonical: config.origin + page.path, robots: page.noindex ? 'noindex' : 'index, follow, max-image-preview:large', structuredData, content, pageScripts: page.name==='index' ? '<script src="/assets/vendor/three.min.js"></script>\n<script type="module" src="/assets/mantis-terminal.js"></script>' : '' });
+    const breadcrumbs=page.name==='index'?'':`<nav class="breadcrumbs container" aria-label="Breadcrumb"><ol><li><a href="/en/">Home</a></li><li><span aria-current="page">${label}</span></li></ol></nav>`;
+    const html = render(layout, { ...values, footer, breadcrumbs, title: escape(page.title), description: escape(page.description), canonical: config.origin + page.path, robots: page.noindex ? 'noindex' : 'index, follow, max-image-preview:large', structuredData, content, pageScripts: page.name==='index' ? '<script src="/assets/vendor/three.min.js"></script>\n<script type="module" src="/assets/mantis-terminal.js"></script>' : '' });
     outputs.set(page.name==='404' ? '404.html' : `en/${page.name}.html`, html.replace(/[ \t]+$/gm,''));
   }
   outputs.set('assets/themes.css', '/* Generated from site/themes.json. */\n' + themes.map(t => `${t.id==='mono'?':root, ':''}:root[data-theme="${t.id}"] {\n  color-scheme: ${t.mode};\n${Object.entries(t.colors).map(([k,v])=>`  --${k}: ${v};`).join('\n')}\n}`).join('\n'));

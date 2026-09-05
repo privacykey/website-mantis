@@ -50,21 +50,61 @@ function element() {
     get scrollHeight(){return this.children.length;}
   };
 }
-for(const reduced of [false,true]) test(`${reduced?'reduced motion':'default preferences'} keep the terminal interactive and replay completes without animation`,async()=>{
+async function simulationFixture({reduced=false,reading=false,saved=null,focusedInput=false}={}) {
   const body=element(),form=element(),input=element(),status=element(),replay=element(),skip=element(),trigger=element(),motion=element();
-  motion.checked=false;
   const elements={'.term-body':body,'form':form,'.term-input':input,'[data-demo-status]':status,'[data-demo-replay]':replay,'[data-demo-skip]':skip,'[data-demo-trigger]':trigger,'[data-demo-motion]':motion};
-  const terminal={querySelector:s=>elements[s],querySelectorAll:()=>[]};
+  const timers=new Map(),storage=new Map(saved?[['mantis-motion-v1',saved]]:[]);let timerId=0;
+  const media={matches:reduced,addEventListener(name,handler){this.change=handler;}};
+  const terminal={querySelector:s=>elements[s],querySelectorAll:()=>[],contains:el=>Object.values(elements).includes(el)};
+  const document={documentElement:{dataset:{readingView:String(reading)}},activeElement:focusedInput?input:null,querySelector:s=>s==='.hero-terminal'?terminal:null,createElement:()=>element()};
+  for(const el of Object.values(elements))el.focus=()=>{document.activeElement=el;};
   const source=(await readFile(new URL('../assets/mantis-terminal.js',import.meta.url),'utf8')).replace(/^import .*?;\n/,'');
-  const context={createDemo,console:{warn(){}},window:{matchMedia:()=>({matches:reduced,addEventListener(){}})},document:{querySelector:s=>s==='.hero-terminal'?terminal:null,createElement:()=>element()},setTimeout(){throw new Error('Animation requires an explicit opt-in');}};
-  vm.runInNewContext(source,context);
-  assert.equal(typeof form.events.submit,'function');
-  await replay.events.click();
-  assert.match(body.children.map(e=>e.textContent).join('\n'),/Generated Q4_forecast.docx/);
-  assert.match(status.textContent,/Demo complete/);
-  assert.equal(skip.hidden,true);
-  trigger.events.click();
-  assert.match(status.textContent,/2 total/);
+  vm.runInNewContext(source,{createDemo,console:{warn(){}},window:{matchMedia:()=>media},document,
+    localStorage:{getItem:k=>storage.get(k),setItem:(k,v)=>storage.set(k,v)},
+    setTimeout(fn){timers.set(++timerId,fn);return timerId;},clearTimeout(id){timers.delete(id);}});
+  return {body,form,input,status,replay,skip,trigger,motion,document,media,timers,storage,
+    transcript:()=>body.children.map(e=>e.textContent).join('\n'),
+    finish(){let limit=10;while(timers.size&&limit--){const [id,fn]=timers.entries().next().value;timers.delete(id);fn();}assert.equal(timers.size,0);}};
+}
+test('autoplay starts by default, completes silently, and never takes keyboard focus',async()=>{
+  const f=await simulationFixture();
+  assert.equal(f.motion.textContent,'Pause animation');assert.equal(f.timers.size,1);
+  assert.match(f.transcript(),/created demo-01/);assert.equal(f.document.activeElement,null);
+  assert.equal(f.input.disabled,false);assert.equal(f.trigger.disabled,false);
+  f.finish();assert.match(f.transcript(),/1 total/);assert.equal(f.skip.hidden,true);
+  assert.equal(f.status.textContent,'');assert.equal(f.document.activeElement,null);
+});
+test('pause freezes the sequence, persists, and resumes from the same step',async()=>{
+  const f=await simulationFixture();const before=f.transcript();f.motion.focus();f.motion.events.click();
+  assert.equal(f.timers.size,0);assert.equal(f.transcript(),before);
+  assert.equal(f.motion.textContent,'Resume animation');assert.equal(f.document.activeElement,f.motion);
+  assert.equal(f.storage.get('mantis-motion-v1'),'paused');
+  f.body.focus();f.body.events.focus();assert.equal(f.transcript(),before);
+  const next=await simulationFixture({saved:f.storage.get('mantis-motion-v1')});assert.equal(next.timers.size,0);
+  f.motion.events.click();assert.equal(f.timers.size,1);f.finish();assert.match(f.transcript(),/1 total/);
+});
+for(const options of [{reduced:true},{reading:true},{saved:'paused'}])test(`${JSON.stringify(options)} suppresses autoplay and keeps immediate replay interactive`,async()=>{
+  const f=await simulationFixture(options);assert.equal(f.timers.size,0);
+  f.replay.focus();f.replay.events.click();assert.equal(f.timers.size,0);
+  assert.match(f.transcript(),/Generated Q4_forecast.docx/);assert.match(f.status.textContent,/Demo complete/);
+  assert.equal(f.document.activeElement,f.replay);assert.equal(f.skip.hidden,true);
+  f.trigger.events.click();assert.match(f.status.textContent,/2 total/);
+});
+test('typing interrupts autoplay so later timer steps cannot overwrite a user command',async()=>{
+  const f=await simulationFixture();f.input.focus();f.input.events.focus();assert.equal(f.timers.size,0);
+  f.input.value='help';f.form.events.submit({preventDefault(){}});
+  assert.match(f.transcript(),/Demo commands:/);assert.equal(f.document.activeElement,f.input);assert.equal(f.skip.hidden,true);
+});
+test('a late-loading demo script does not start autoplay when the visitor is already using its input',async()=>{
+  const f=await simulationFixture({focusedInput:true});assert.equal(f.timers.size,0);
+  assert.equal(f.document.activeElement,f.input);assert.equal(f.status.textContent,'');
+});
+test('skipping a replay restores focus and changing reduced motion stops a running sequence',async()=>{
+  const f=await simulationFixture();f.skip.focus();f.skip.events.click();
+  assert.equal(f.document.activeElement,f.replay);assert.equal(f.timers.size,0);assert.match(f.transcript(),/1 total/);
+  f.replay.events.click();assert.equal(f.timers.size,1);
+  f.media.matches=true;f.media.change({matches:true});assert.equal(f.timers.size,0);
+  assert.equal(f.motion.disabled,true);assert.equal(f.motion.textContent,'Reduced motion on');assert.equal(f.skip.hidden,true);
 });
 
 async function badgeFixture(run,cache=null,fail=false) {

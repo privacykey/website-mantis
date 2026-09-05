@@ -8,7 +8,7 @@
     <p class="hero-guidance">A fetch is a signal to investigate. <a href="#compatibility">Check what triggers each format.</a></p>
     <div class="demo-layout">
       <div class="hero-terminal" role="group" aria-label="Simulated mantis terminal">
-        <div class="term-bar"><span class="dot live" aria-hidden="true"></span><span class="title">mantis · simulation</span><span class="right">local demo</span></div>
+        <div class="term-bar"><span class="dot live" aria-hidden="true"></span><span class="title">mantis · simulation</span><button type="button" class="motion-control js-only" data-demo-motion>Pause animation</button></div>
         <div class="term-body" tabindex="0" role="region" aria-label="Demo transcript">
           <div class="term-line">$ mantis new "Q4 forecast" -w https://hook.example.com/q4</div>
           <div class="term-line">→ created demo-01</div>
@@ -20,7 +20,7 @@
           <div class="term-line">[simulation] Webhook alert delivered.</div>
         </div>
         <form class="term-input-line js-only" aria-label="Try a demo command"><label class="sr-only" for="demo-command">Demo command</label><span class="prompt" aria-hidden="true">$</span><input id="demo-command" aria-describedby="demo-help" class="term-input" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Try mantis list"><button type="submit" class="demo-run">Run</button></form>
-        <div class="demo-controls js-only"><label class="check-option"><input type="checkbox" data-demo-motion> Animate demo</label><button type="button" data-demo-replay>Replay demo</button><button type="button" data-demo-skip hidden>Skip animation</button><button type="button" data-demo-command='mantis new "My demo key" -w https://hook.example.com/demo'>Create a key</button><button type="button" data-demo-command="mantis list">List keys</button><button type="button" data-demo-trigger>Simulate a fetch</button></div>
+        <div class="demo-controls js-only"><button type="button" data-demo-replay>Replay demo</button><button type="button" data-demo-skip hidden>Skip animation</button><button type="button" data-demo-command='mantis new "My demo key" -w https://hook.example.com/demo'>Create a key</button><button type="button" data-demo-command="mantis list">List keys</button><button type="button" data-demo-trigger>Simulate a fetch</button></div>
         <p id="demo-help" class="demo-disclaimer">Simulated keys and alerts. Type help for supported commands. Commands stay in this page; nothing is installed or sent.</p>
         <p class="sr-only" role="status" aria-live="polite" aria-atomic="true" data-demo-status></p>
       </div>

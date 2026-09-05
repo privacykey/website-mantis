@@ -23,7 +23,31 @@ Keyboard actions were executed in the browser, and rendered DOM geometry,
 computed colors, and accessibility-tree output were inspected. A clean scan
 does not establish accessibility support in every browser or screen reader.
 
-## Recorded results
+## Hero presentation update — 5 September 2026
+
+The homepage now leads with the simulation. The globe rotates and the opening
+sequence plays once by default; neither takes keyboard focus or announces
+automatic updates. A visible Pause animation button stops both and remembers
+the choice. Reduced motion and reading view suppress autoplay. A paused globe
+remains visible, and demo commands stay usable. Connection arcs fade gradually
+and are limited to one per second. This uses the control approach described by
+[W3C's pause/stop guidance](https://www.w3.org/WAI/WCAG22/Understanding/pause-stop-hide.html).
+
+Reading links, summaries, and page indexes are grouped under the shared
+Glossary & accessibility footer heading. Secondary pages retain breadcrumbs;
+the homepage identifies itself through its title, brand link, and main heading.
+
+Validation after these changes: 24 unit tests pass; 56 axe scans across all eight
+pages and seven themes report zero violations, with the same contrast cases
+left for manual review. All 128 layout checks pass at 320, 390, 768, and 1280 px
+across standard text, 200% text, 200% reading view, and text-spacing overrides.
+Footer summaries and page indexes were expanded. Keyboard traversal covered
+644 focus stops across every page at 320 and 1280 px without obscured focus.
+Pause/resume, saved pause after reload, skip focus return, and typing during
+autoplay were exercised in the browser. System reduced motion is covered by
+unit tests; the native OS/browser/AT checks below remain pending.
+
+## Baseline results before the hero presentation update
 
 - 56 final axe-core 4.13.0 scans: eight pages × seven themes; **zero reported
   violations**. Summaries and page indexes were expanded; homepage edge setup
@@ -104,14 +128,14 @@ remain subject to the browser and assistive-technology support review below.
 | 2.1.3 | AAA | Checked | No pointer-only functionality; decorative canvas has no action. |
 | 2.1.4 | A | N/A | No global single-character shortcuts. Commands require focus in their input. |
 | 2.2.1 | A | Checked | No input deadlines; copy/status feedback persists. |
-| 2.2.2 | A | Checked | Motion starts off; opt-in globe can stop; replay can be skipped. |
+| 2.2.2 | A | Checked | Globe and opening sequence autoplay; a persistent pause control stops both, and replay can be skipped. |
 | 2.2.3 | AAA | Checked | Demo and settings impose no time limit on user actions. |
 | 2.2.4 | AAA | Checked | No promotions, automatic context switches, or unsolicited demo announcements. |
 | 2.2.5 | AAA | N/A | No sign-in or authenticated sessions. |
 | 2.2.6 | AAA | N/A | No inactivity timeout. |
-| 2.3.1 | A | Checked | Blink/scanline effects removed; simulated hits do not flash. |
-| 2.3.2 | AAA | Checked | No rapid flashes; optional globe rotates without hit flashes. |
-| 2.3.3 | AAA | Checked | Motion disabled by default and with reduced motion; explicit opt-in control. |
+| 2.3.1 | A | Checked | Blink/scanline effects removed; connection arcs are gradual and rate limited. |
+| 2.3.2 | AAA | Checked | Connection arcs fade gradually and are limited to one per second; no rapid flashes. |
+| 2.3.3 | AAA | Checked | Pause disables motion; reduced motion and reading view suppress autoplay. |
 | 2.4.1 | A | Checked | Working skip link, shared landmarks, and page indexes. |
 | 2.4.2 | A | Checked | Distinct, descriptive generated page titles. |
 | 2.4.3 | A | Checked | Natural focus order; fragment targets focused; replay returns focus correctly. |
@@ -119,7 +143,7 @@ remain subject to the browser and assistive-technology support review below.
 | 2.4.5 | AA | Checked | Primary/footer navigation, linked HTML site index, and content links. |
 | 2.4.6 | AA | Checked | Descriptive headings, visible labels, and native disclosure names. |
 | 2.4.7 | AA | Checked | Focus outline visible throughout desktop/mobile traversal. |
-| 2.4.8 | AAA | Checked | Breadcrumbs and current-page labels on every page. |
+| 2.4.8 | AAA | Checked | Secondary-page breadcrumbs and current-page labels; homepage title, brand, and main heading establish its location. |
 | 2.4.9 | AAA | Checked | Ambiguous guide/licence names clarified; full accessible link names reviewed. |
 | 2.4.10 | AAA | Checked | Content sections have headings; generated page indexes for longer pages. |
 | 2.4.11 | AA | Checked | No sticky header; focus scrolls into view; menu closes when focus leaves. |

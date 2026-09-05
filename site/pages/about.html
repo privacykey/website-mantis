@@ -1,0 +1,21 @@
+<section><div class="container"><article class="prose">
+  <p class="kicker">about</p>
+  <h1>A tripwire that calls home.</h1>
+  <p>mantis creates unique URLs you can place in files, systems, and websites. When a URL is fetched, you get a signal to investigate. The name comes from the praying mantis: still until something moves.</p>
+  <h2>From a request to an alert</h2>
+  <p>Choose a backend, create a key, and place its URL where an unexpected fetch would matter. Supported document generators and device installers help you place it. The full server records hits and queues notifications; edge forwards them to a webhook.</p>
+  <p>A hit is evidence of a request, not proof of a person's identity or intent. Readers, preview services, crawlers, proxies, and scanners may fetch links too. File behavior depends on the format and reader. <a href="/en/#compatibility">Check compatibility and test your canary</a> before relying on it.</p>
+  <h2>What you can use it for</h2>
+  <ul><li>Baited documents, honey-directory bundles, and credential/config artifacts.</li><li>Supported login, sudo, boot, wake, and network events, with device bundles for several alarms at once.</li><li>Bulk key creation and managed-device enrollment with create-only credentials.</li><li>CSS and JS web snippets, NFC/QR URLs, and configured Apple Wallet passes.</li><li>Notifications and automation through your existing services.</li></ul>
+  <p><a href="/en/#capabilities">Explore capabilities and their requirements →</a></p>
+  <h2>Choose how it runs</h2>
+  <p><strong>Full</strong> is a Next.js and Postgres server with a dashboard, key management, history, and delivery retries. <strong>Edge</strong> is a stateless Cloudflare Worker with self-contained URLs and webhook forwarding. One CLI supports both through different command groups.</p>
+  <p><a href="/en/#compare">Compare full and edge →</a></p>
+  <h2>Status</h2>
+  <p><strong>Pre-1.0.</strong> APIs, commands, configuration, and stored data formats may change, including in patch releases. Keep backups and read the <a href="https://docs.mantis.privacykey.org/updating/">updating guide</a>.</p>
+  <p>{{releases}}. Components are versioned separately. Full and edge can also be built from source; their package versions are not presented here as tagged releases.</p>
+  <p>The product's own code is MIT-licensed. This marketing website is Apache-2.0. <a href="/en/legal.html">See licences and dependency details</a>.</p>
+  <h2>Where it fits</h2>
+  <p>Canaries provide another signal alongside access controls and monitoring. They are discoverable, depend on a network fetch, and do not replace prevention or incident investigation. Forward webhooks to your existing tools when you need broader correlation.</p>
+  <p class="meta-line">A <a href="https://github.com/privacykey">privacykey</a> project.</p>
+</article></div></section>

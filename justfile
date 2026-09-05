@@ -2,14 +2,19 @@
 default:
     @just --list
 
-# Serve the static site locally (reads wrangler.jsonc)
+# Rebuild and preview the site locally (Node.js 22+)
 [group("dev")]
 run:
-    npx --yes wrangler@latest dev
+    node scripts/build.mjs
+    node scripts/serve.mjs
 
-# Deploy by hand. Normally Cloudflare Workers Builds does this on every push
-# to main (Git integration); use this when that is broken or a change has to
-# go out without a merge. Needs a logged-in wrangler (`npx wrangler login`).
+# Check generated files, links, themes, and behavior
+[group("dev")]
+check:
+    node scripts/check.mjs
+    node --test tests/*.test.mjs
+
+# Publish by hand; pushes to main also deploy through Cloudflare Workers Builds
 [group("deploy")]
-deploy:
+deploy: check
     npx --yes wrangler@latest deploy

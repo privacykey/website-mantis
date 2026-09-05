@@ -15,3 +15,9 @@ README.md
 LICENSE
 NOTICE
 justfile
+site/
+scripts/
+tests/
+node_modules/
+package.json
+.wrangler/

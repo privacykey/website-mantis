@@ -10,6 +10,17 @@ const pages=new Map(await Promise.all(htmlFiles.map(async f=>[f,await readFile(r
 const external=new Set();
 let links=0;
 for (const [file,html] of pages) {
+  assert(/<html\b[^>]*\blang="en"/.test(html),`${file}: declared page language`);
+  assert.equal((html.match(/<main(?:\s|>)/g)||[]).length,1,`${file}: one main landmark`);
+  assert(/class="skip-link" href="#main"/.test(html),`${file}: skip link`);
+  assert(html.includes('aria-label="Primary"') && html.includes('aria-label="Breadcrumb"'),`${file}: navigation landmarks`);
+  assert(html.includes('Plain-language summary') && html.includes('/en/glossary.html') && html.includes('/en/accessibility.html'),`${file}: reading help`);
+  assert(!/tabindex="[1-9][0-9]*"/.test(html),`${file}: preserve natural keyboard order`);
+  assert(!/target="_blank"/.test(html),`${file}: keep navigation in the requested context`);
+  assert(!/maximum-scale|user-scalable\s*=\s*(?:no|0)/.test(html),`${file}: browser zoom allowed`);
+  assert(!/__audit\/|axe(?:\.min)?\.js/.test(html),`${file}: development audit is not published`);
+  for(const [,attributes] of html.matchAll(/<img\b([^>]*)>/g)) assert(/\balt="[^"]*"/.test(attributes),`${file}: image alternative`);
+  for(const [,id] of html.matchAll(/<input\b[^>]*\bid="([^"]+)"/g)) assert(html.includes(`for="${id}"`),`${file}: input ${id} has a visible label`);
   assert.equal((html.match(/<h1(?:\s|>)/g)||[]).length,1,`${file}: one h1`);
   assert(!/\{\{\w+\}\}/.test(html),`${file}: unresolved template`);
   const ids=[...html.matchAll(/\bid="([^"]+)"/g)].map(m=>m[1]);
@@ -36,7 +47,11 @@ function luminance(hex) {
 }
 for(const t of themes) for(const fg of ['accent','accent-bright','accent-soft','accent-dim','alarm']) for(const bg of ['bg','bg-soft','bg-deep']) {
   const a=luminance(t.colors[fg]),b=luminance(t.colors[bg]);
-  assert((Math.max(a,b)+.05)/(Math.min(a,b)+.05)>=4.5,`${t.id}: ${fg} contrast on ${bg}`);
+  assert((Math.max(a,b)+.05)/(Math.min(a,b)+.05)>=7,`${t.id}: ${fg} AAA contrast on ${bg}`);
+}
+for(const t of themes) for(const bg of ['bg','bg-soft','bg-deep']) {
+  const a=luminance(t.colors['accent-line-strong']),b=luminance(t.colors[bg]);
+  assert((Math.max(a,b)+.05)/(Math.min(a,b)+.05)>=3,`${t.id}: control boundary contrast on ${bg}`);
 }
 if (process.argv.includes('--links')) {
   for (const url of external) {
@@ -45,4 +60,4 @@ if (process.argv.includes('--links')) {
   }
   console.log(`Checked ${external.size} live documentation URLs.`);
 }
-console.log(`Checked generated pages, ${links} local links, and all text colors in ${themes.length} themes.`);
+console.log(`Checked generated pages, accessibility structure, ${links} local links, AAA text contrast, and control boundaries in ${themes.length} themes.`);

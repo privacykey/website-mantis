@@ -3,6 +3,10 @@
   'use strict';
   var year = document.getElementById('year');
   if (year) year.textContent = new Date().getFullYear();
+  function announce(message) {
+    var status=document.getElementById('interaction-status');
+    if(status)status.textContent=message;
+  }
 
   var worker = document.querySelector('[data-worker-url]');
   if (worker) {
@@ -20,6 +24,9 @@
       worker.setAttribute('aria-invalid', worker.value && !valid ? 'true' : 'false');
       document.getElementById('worker-hint').textContent = valid ? 'Ready to copy. This URL stays in your browser.' : 'Enter an HTTPS Worker base URL without a path, credentials, query, or fragment.';
     });
+    worker.addEventListener('blur',function() {
+      if(worker.value && worker.dataset.valid!=='true')announce('Worker URL error. Enter an HTTPS base URL such as https://your-worker.workers.dev, without a path, credentials, query, or fragment.');
+    });
   }
 
   async function copyText(text) {
@@ -36,18 +43,17 @@
   }
   document.querySelectorAll('[data-copy]').forEach(function (button) {
     var label = button.textContent;
+    var busy = false;
     button.addEventListener('click', async function () {
+      if(busy || button.disabled)return;
       var code = button.closest('.code-wrap').querySelector('pre.code-block code');
       if (!code) return;
-      button.disabled = true;
-      try { await copyText(code.textContent.trim()); button.textContent = 'Copied'; }
-      catch (e) { button.textContent = 'Select and copy the command'; }
-      finally {
-        setTimeout(function () {
-          button.textContent = label;
-          button.disabled = button.hasAttribute('data-needs-worker') && document.querySelector('[data-worker-url]').dataset.valid !== 'true';
-        }, 1800);
-      }
+      busy=true;button.setAttribute('aria-busy','true');
+      var feedback=button.closest('.code-wrap').querySelector('.copy-feedback');
+      if(!feedback) { feedback=document.createElement('p');feedback.className='copy-feedback';button.closest('.code-wrap').appendChild(feedback); }
+      try { await copyText(code.textContent.trim()); feedback.textContent='Copied. '+label.replace(/^Copy\s*/i,'')+' is on your clipboard.'; }
+      catch (e) { feedback.textContent='Copy was unavailable. Select the command text and use your browser’s Copy command.'; }
+      finally { busy=false;button.removeAttribute('aria-busy');announce(feedback.textContent); }
     });
   });
 

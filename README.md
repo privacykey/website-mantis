@@ -8,6 +8,7 @@ The site serves static HTML, CSS, and JavaScript. A small, dependency-free Node.
 build shares navigation, footers, metadata, themes, release data, and capability
 cards across pages. Generated assets are committed, so a static host can serve the
 repository root. Node.js 22 or newer is required for maintenance; no install step.
+The optional browser accessibility audit uses a pinned development dependency.
 
 ## Edit and preview
 
@@ -26,9 +27,11 @@ nested 404 fallback, serves fresh assets, and keeps source directories private.
 | `site/layout.html`, `site/partials/` | Shared document, navigation, and footer |
 | `site/config.json` | Page metadata and content review date |
 | `site/capabilities.json` | Curated feature cards and backend scope |
+| `site/summaries.json`, `site/glossary.json` | Plain-language summaries and terminology |
 | `site/themes.json`, `site/theme.js` | Theme palettes and theme/menu behavior |
 | `site/mantis-terminal.js`, `assets/demo-state.js` | Demo UI and in-memory simulation |
 | `assets/site.css`, `assets/footer.js` | Layout, copy buttons, setup form, CI status |
+| `assets/reading-preferences.js` | Text size, reading view, reversible local preferences |
 | `scripts/render-social.py` | Social PNG renderer (optional Python + Pillow) |
 
 Do not hand-edit generated `en/*.html`, `404.html`, `assets/themes.css`,
@@ -42,7 +45,8 @@ need Python or fonts.
 
 The terminal is explicitly a local simulation. It does not contact a Mantis
 server, write files, or send notifications. Its static transcript works without
-JavaScript; reduced-motion users retain all controls without animation.
+JavaScript. Animation is off until the visitor enables it; reduced-motion users
+retain the demo commands with immediate replay. Copy feedback does not expire.
 The maker avatar and Three.js are served locally. The optional main-CI badge
 contacts GitHub; the [privacy page](https://mantis.privacykey.org/en/privacy.html)
 documents that request and local storage.
@@ -56,10 +60,40 @@ node scripts/check.mjs --links
 ```
 
 The first two commands run in CI. Checks cover generated-file drift, local links
-and anchors, theme text contrast, demo state and reduced motion, release selection,
-lockfile parsing, and the main-CI badge's filtering/cache behavior. `--links` also
+and anchors, language/landmarks, labels, AAA theme text contrast (7:1), control
+boundary contrast (3:1), reading preferences and error recovery, keyboard menu
+behavior, demo state and motion preferences, release selection, lockfile parsing,
+and the main-CI badge's filtering/cache behavior. `--links` also
 checks live documentation links and requires network access. Browser checks should
 cover narrow screens, keyboard navigation, copy feedback, and the edge URL form.
+
+## Accessibility maintenance
+
+WCAG 2.2 AAA is the target, not a completed conformance claim. Read the
+[criterion-by-criterion audit and remaining validation](docs/accessibility-audit.md)
+before describing the site as conformant. This scope is the marketing website;
+the product and separate documentation site require their own audits.
+
+```sh
+npm ci
+npm run audit:browser
+# Open http://127.0.0.1:8742/en/ and activate Run accessibility audit at the bottom.
+# Add ?nojs to inspect a preview with all scripts removed.
+```
+
+The audit server injects axe-core only into the local preview. The audit panel,
+scripts, dependency, and audit records are excluded from hosted assets. `npm run
+dev` provides the normal preview. A clean automated scan is only one part of the
+review; inspect the reported manual checks too.
+
+For each page and theme, also test Tab/Shift+Tab, Enter/Space, Escape, native
+selection controls, disclosure sections, invalid forms, copy feedback, and demo
+replay/skip. Test 200% text, 320 CSS-pixel reflow, text-spacing overrides, reading
+view, and custom colors. Keep standalone controls at least 44×44 CSS pixels and
+retain visible, unobscured focus. Verify tables, errors, and status announcements
+with screen readers, plus real browser zoom and operating-system contrast modes.
+New audio/video, authentication, time limits, dialogs, gestures, or submission
+flows require a new review of criteria that are currently not applicable.
 
 ## Keep facts current
 

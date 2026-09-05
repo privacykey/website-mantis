@@ -21,8 +21,21 @@
   refresh();
   var menu = document.querySelector('.nav-menu');
   if (menu) {
+    document.addEventListener('focusin', function(e) { if (!menu.contains(e.target)) menu.open = false; });
     menu.querySelectorAll('a').forEach(function(a) { a.addEventListener('click', function() { menu.open = false; }); });
     document.addEventListener('keydown', function(e) { if (e.key === 'Escape' && menu.open) { menu.open = false; menu.querySelector('summary').focus(); } });
     document.addEventListener('click', function(e) { if (!menu.contains(e.target)) menu.open = false; });
   }
+  // Native fragment navigation scrolls, but not every browser moves keyboard focus.
+  document.querySelectorAll('a[href]').forEach(function(link) {
+    link.addEventListener('click',function(e) {
+      if(e.ctrlKey || e.metaKey || e.shiftKey || e.altKey || e.button) return;
+      var url=new URL(link.href,location.href);
+      if(url.origin!==location.origin || url.pathname!==location.pathname || !url.hash) return;
+      var target=document.getElementById(decodeURIComponent(url.hash.slice(1)));
+      if(!target) return;
+      target.setAttribute('tabindex','-1');
+      target.focus({preventScroll:true});
+    });
+  });
 })();

@@ -50,12 +50,13 @@ function element() {
     get scrollHeight(){return this.children.length;}
   };
 }
-test('reduced motion keeps the terminal interactive and replay completes without animation',async()=>{
-  const body=element(),form=element(),input=element(),status=element(),replay=element(),skip=element(),trigger=element();
-  const elements={'.term-body':body,'form':form,'.term-input':input,'[data-demo-status]':status,'[data-demo-replay]':replay,'[data-demo-skip]':skip,'[data-demo-trigger]':trigger};
+for(const reduced of [false,true]) test(`${reduced?'reduced motion':'default preferences'} keep the terminal interactive and replay completes without animation`,async()=>{
+  const body=element(),form=element(),input=element(),status=element(),replay=element(),skip=element(),trigger=element(),motion=element();
+  motion.checked=false;
+  const elements={'.term-body':body,'form':form,'.term-input':input,'[data-demo-status]':status,'[data-demo-replay]':replay,'[data-demo-skip]':skip,'[data-demo-trigger]':trigger,'[data-demo-motion]':motion};
   const terminal={querySelector:s=>elements[s],querySelectorAll:()=>[]};
   const source=(await readFile(new URL('../assets/mantis-terminal.js',import.meta.url),'utf8')).replace(/^import .*?;\n/,'');
-  const context={createDemo,console:{warn(){}},window:{matchMedia:()=>({matches:true,addEventListener(){}})},document:{querySelector:s=>s==='.hero-terminal'?terminal:null,createElement:()=>element()},setTimeout(){throw new Error('Reduced motion must not schedule animation');}};
+  const context={createDemo,console:{warn(){}},window:{matchMedia:()=>({matches:reduced,addEventListener(){}})},document:{querySelector:s=>s==='.hero-terminal'?terminal:null,createElement:()=>element()},setTimeout(){throw new Error('Animation requires an explicit opt-in');}};
   vm.runInNewContext(source,context);
   assert.equal(typeof form.events.submit,'function');
   await replay.events.click();

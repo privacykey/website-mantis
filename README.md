@@ -45,8 +45,12 @@ need Python or fonts.
 
 The terminal is explicitly a local simulation. It does not contact a Mantis
 server, write files, or send notifications. Its static transcript works without
-JavaScript. Animation is off until the visitor enables it; reduced-motion users
-retain the demo commands with immediate replay. Copy feedback does not expire.
+JavaScript. The globe and opening simulation animate by default without moving
+focus or announcing automatic updates. Pause animation stops both and is saved
+in the browser. Reduced motion and reading view suppress autoplay; the demo
+commands and immediate replay remain available. Copy feedback does not expire.
+Glossary links, reading tools, summaries, and page indexes live in a dedicated
+section at the bottom of every page.
 The maker avatar and Three.js are served locally. The optional main-CI badge
 contacts GitHub; the [privacy page](https://mantis.privacykey.org/en/privacy.html)
 documents that request and local storage.

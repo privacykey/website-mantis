@@ -5,19 +5,19 @@ import { createDemo } from "/assets/demo-state.js";
  * Two cooperating systems:
  *
  *  1. Three.js wireframe globe (.hero-globe canvas)
- *     - perspective camera, optional slow rotation
+ *     - perspective camera, slow rotation with a persistent pause control
  *     - latitude/longitude line cage rendered as LineSegments
- *     - movement requires the unchecked-by-default Animate demo control;
- *       simulated fetches do not produce flashes.
+ *     - simulated fetches draw gentle connection arcs, limited to one per second.
  *
  *  2. Local simulation (.hero-terminal DOM)
  *     - a complete transcript is visible before JavaScript loads;
- *     - Replay is opt-in; supported commands update one in-memory model;
+ *     - the opening sequence plays once without moving keyboard focus;
+ *       supported commands update one in-memory model;
  *     - simulated fetches update the selected key's hit count.
  *
  *  Accessibility / perf:
- *   - Animation is off by default. Reduced motion keeps it off and makes
- *     Replay immediate, even if the visitor previously enabled animation.
+ *   - Pause stops both the sequence and globe. Reduced motion, reading view,
+ *     or a saved pause preference suppress autoplay and make Replay immediate.
  *     The transcript, input, and all demo controls remain usable.
  *   - Container is aria-hidden + pointer-events:none for the canvas.
  *   - DPR capped at 2, render paused when tab is hidden or hero is
@@ -97,7 +97,7 @@ import { createDemo } from "/assets/demo-state.js";
     function loadThemeColors () {
       ACCENT.set(readVar('--accent',        '#FFB000'));
       ACCENT_HI.set(readVar('--accent-bright', '#FFC840'));
-      ACCENT_LO.set(readVar('--accent-line',   '#3d2a04'));
+      ACCENT_LO.set(readVar('--accent-line-strong', '#8b641a'));
       ALARM.set(readVar('--alarm',          '#ff5a3c'));
     }
     loadThemeColors();
@@ -406,7 +406,11 @@ import { createDemo } from "/assets/demo-state.js";
     resume();
 
     // ── Public API (closure) ──
+    var lastPingAt = -Infinity;
     globe.ping = function (opts) {
+      var now = performance.now();
+      if (now - lastPingAt < 1000) return;
+      lastPingAt = now;
       opts = opts || {};
       var r = opts.region || randomRegion();
       spawnPing(r.lat, r.lon, !!opts.alarmed);
@@ -425,9 +429,9 @@ import { createDemo } from "/assets/demo-state.js";
 
   // Bootstrap globe (if container exists)
   var globeRoot = document.querySelector('.hero-globe');
-  if (globeRoot && THREE && !motion.matches) setupGlobe(globeRoot);
+  if (globeRoot && THREE) setupGlobe(globeRoot);
 
-  // The transcript is ordinary HTML until someone asks to interact or replay.
+  // Static HTML is the fallback; autoplay never moves focus or speaks updates.
   var terminal = document.querySelector('.hero-terminal');
   if (!terminal) return;
   var body = terminal.querySelector('.term-body');
@@ -437,17 +441,25 @@ import { createDemo } from "/assets/demo-state.js";
   var replayButton = terminal.querySelector('[data-demo-replay]');
   var skipButton = terminal.querySelector('[data-demo-skip]');
   var motionToggle = terminal.querySelector('[data-demo-motion]');
-  function animationEnabled() { return !!motionToggle && motionToggle.checked && !motion.matches; }
+  var readingView = document.documentElement.dataset.readingView === 'true';
+  var paused = false;
+  try { paused = localStorage.getItem('mantis-motion-v1') === 'paused'; } catch(e) {}
+  function animationEnabled() { return !paused && !motion.matches && !readingView; }
   function updateAnimation() {
-    if(motionToggle) { motionToggle.disabled=motion.matches; if(motion.matches)motionToggle.checked=false; }
+    if(motionToggle) {
+      motionToggle.disabled=motion.matches || readingView;
+      motionToggle.textContent=motion.matches?'Reduced motion on':readingView?'Reading view on':paused?'Resume animation':'Pause animation';
+    }
     if(globeRoot)globeRoot.parentElement.dataset.motionEnabled=String(animationEnabled());
     if(globe.setAnimation)globe.setAnimation(animationEnabled());
+    clearTimeout(replayTimer);replayTimer=null;
+    if(playing && animationEnabled())replayTimer=setTimeout(advanceReplay,1100);
   }
-  if(motionToggle)motionToggle.addEventListener('change',updateAnimation);
-  updateAnimation();
   var demo = createDemo();
-  var replayId = 0;
   var playing = false;
+  var replayTimer = null;
+  var nextStep = 0;
+  var replayRequested = false;
   function write(line) {
     var div = document.createElement('div');
     div.className = 'term-line';
@@ -463,15 +475,11 @@ import { createDemo } from "/assets/demo-state.js";
     demo.execute('mantis watch'); demo.trigger();
   }
   seed();
-  function controls(locked) {
+  function stopReplay() {
     var hadSkipFocus = document.activeElement === skipButton;
-    playing = locked;
-    terminal.querySelectorAll('input,button').forEach(function(el) { el.disabled = locked; });
-    skipButton.disabled = false;
-    skipButton.hidden = !locked;
-    if(motionToggle)motionToggle.disabled=locked || motion.matches;
-    if (locked) skipButton.focus();
-    else if (hadSkipFocus) replayButton.focus();
+    clearTimeout(replayTimer);replayTimer=null;
+    playing=false;skipButton.hidden=true;
+    if(hadSkipFocus)replayButton.focus();
   }
   function run(command, userAction) {
     if (command.trim() === 'clear') { body.replaceChildren(); if (userAction) announce('Transcript cleared. Demo keys are preserved.'); return; }
@@ -483,7 +491,7 @@ import { createDemo } from "/assets/demo-state.js";
   }
   function trigger(userAction) {
     var lines = demo.trigger(); lines.forEach(write);
-    // Keep the optional globe rotation calm; simulated hits never flash.
+    if(animationEnabled())globe.ping({alarmed:true});
     if (userAction) announce(lines.join(' '));
   }
   var sequence = [
@@ -493,25 +501,42 @@ import { createDemo } from "/assets/demo-state.js";
     function(){write('[simulation] A compatible reader fetched the embedded URL.');trigger(false);}
   ];
   function showCompleted() {
-    replayId++; demo.reset(); body.replaceChildren();
+    stopReplay();demo.reset();body.replaceChildren();
     sequence.forEach(function(step){step();});
-    controls(false);
   }
-  async function replay() {
-    var id = ++replayId;
-    demo.reset(); body.replaceChildren(); controls(true);
-    for (var i=0; i<sequence.length; i++) {
-      if (id !== replayId) return;
-      sequence[i]();
-      if (animationEnabled() && i<sequence.length-1) await new Promise(function(resolve){setTimeout(resolve,1100);});
+  function advanceReplay() {
+    replayTimer=null;
+    if(!playing || !animationEnabled())return;
+    sequence[nextStep++]();
+    if(nextStep===sequence.length) {
+      stopReplay();
+      if(replayRequested)announce('Demo complete. One key, one generated document, and one simulated hit.');
+    } else replayTimer=setTimeout(advanceReplay,1100);
+  }
+  function replay(userAction) {
+    stopReplay();replayRequested=userAction;
+    if(!animationEnabled()) {
+      showCompleted();
+      if(userAction)announce('Demo complete. One key, one generated document, and one simulated hit.');
+      return;
     }
-    if (id !== replayId) return;
-    controls(false); announce('Demo complete. One key, one generated document, and one simulated hit.');
+    demo.reset();body.replaceChildren();nextStep=0;playing=true;skipButton.hidden=false;
+    advanceReplay();
   }
-  replayButton.addEventListener('click',replay);
+  replayButton.addEventListener('click',function(){replay(true);});
   skipButton.addEventListener('click',function(){showCompleted();replayButton.focus();announce('Animation skipped. The completed transcript is ready.');});
-  terminal.querySelectorAll('[data-demo-command]').forEach(function(button){button.addEventListener('click',function(){run(button.dataset.demoCommand,true);});});
-  terminal.querySelector('[data-demo-trigger]').addEventListener('click',function(){trigger(true);});
-  form.addEventListener('submit',function(e){e.preventDefault();if(playing)return;var command=input.value.trim().slice(0,500);input.value='';if(command)run(command,true);});
-  motion.addEventListener('change',function(e){updateAnimation();if(e.matches && playing){showCompleted();announce('Animation stopped for reduced motion.');}});
+  terminal.querySelectorAll('[data-demo-command]').forEach(function(button){button.addEventListener('click',function(){stopReplay();run(button.dataset.demoCommand,true);});});
+  terminal.querySelector('[data-demo-trigger]').addEventListener('click',function(){stopReplay();trigger(true);});
+  input.addEventListener('focus',stopReplay);
+  body.addEventListener('focus',function(){if(animationEnabled())stopReplay();});
+  form.addEventListener('submit',function(e){e.preventDefault();stopReplay();var command=input.value.trim().slice(0,500);input.value='';if(command)run(command,true);});
+  if(motionToggle)motionToggle.addEventListener('click',function(){
+    paused=!paused;
+    try { localStorage.setItem('mantis-motion-v1',paused?'paused':'running'); } catch(e) {}
+    updateAnimation();
+    announce(paused?'Animation paused. The demo controls still work.':'Animation resumed.');
+  });
+  motion.addEventListener('change',function(e){updateAnimation();if(e.matches && playing)showCompleted();});
+  updateAnimation();
+  if(animationEnabled() && !terminal.contains(document.activeElement))replay(false);
 })();

@@ -13,7 +13,8 @@ for (const [file,html] of pages) {
   assert(/<html\b[^>]*\blang="en"/.test(html),`${file}: declared page language`);
   assert.equal((html.match(/<main(?:\s|>)/g)||[]).length,1,`${file}: one main landmark`);
   assert(/class="skip-link" href="#main"/.test(html),`${file}: skip link`);
-  assert(html.includes('aria-label="Primary"') && html.includes('aria-label="Breadcrumb"'),`${file}: navigation landmarks`);
+  assert(html.includes('aria-label="Primary"'),`${file}: primary navigation landmark`);
+  if(file!=='en/index.html')assert(html.includes('aria-label="Breadcrumb"'),`${file}: breadcrumb landmark`);
   assert(html.includes('Plain-language summary') && html.includes('/en/glossary.html') && html.includes('/en/accessibility.html'),`${file}: reading help`);
   assert(!/tabindex="[1-9][0-9]*"/.test(html),`${file}: preserve natural keyboard order`);
   assert(!/target="_blank"/.test(html),`${file}: keep navigation in the requested context`);

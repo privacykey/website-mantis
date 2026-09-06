@@ -21,3 +21,5 @@ tests/
 node_modules/
 package.json
 .wrangler/
+package-lock.json
+docs/

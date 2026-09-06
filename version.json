@@ -2,16 +2,22 @@
   "source": "privacykey/mantis",
   "components": {
     "cli": {
-      "tag": "cli-v0.2.1",
-      "version": "0.2.1",
-      "url": "https://github.com/privacykey/mantis/releases/tag/cli-v0.2.1",
-      "published_at": "2026-09-05T10:02:28Z"
+      "tag": "cli-v0.2.2",
+      "version": "0.2.2",
+      "url": "https://github.com/privacykey/mantis/releases/tag/cli-v0.2.2",
+      "published_at": "2026-09-05T15:20:29Z"
     },
     "full": {
-      "tag": "v0.2.0",
-      "version": "0.2.0",
-      "url": "https://github.com/privacykey/mantis/releases/tag/v0.2.0",
-      "published_at": "2026-09-05T10:03:12Z"
+      "tag": "v0.2.1",
+      "version": "0.2.1",
+      "url": "https://github.com/privacykey/mantis/releases/tag/v0.2.1",
+      "published_at": "2026-09-05T15:21:11Z"
+    },
+    "edge": {
+      "tag": "edge-v0.1.5",
+      "version": "0.1.5",
+      "url": "https://github.com/privacykey/mantis/releases/tag/edge-v0.1.5",
+      "published_at": "2026-09-05T15:21:10Z"
     }
   }
 }

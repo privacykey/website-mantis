@@ -5,11 +5,54 @@
   "website": "https://github.com/privacykey/website-mantis",
   "reviewedAt": "2026-09-05",
   "pages": [
-    { "name": "index", "title": "mantis · tripwire URLs that tell you when they are fetched", "description": "Plant a tripwire URL in a document, device, or website. Get an alert when it is fetched. Self-hosted or Cloudflare edge. Open source.", "path": "/en/" },
-    { "name": "about", "title": "About mantis", "description": "What mantis detects, how it works, and where a canary fits in your security setup.", "path": "/en/about.html" },
-    { "name": "docs", "title": "mantis documentation", "description": "Get started with mantis: setup, compatibility, device bundles, deployment, and the CLI and API references.", "path": "/en/docs.html" },
-    { "name": "privacy", "title": "mantis website privacy", "description": "How this website uses local storage, its GitHub CI request, and Cloudflare hosting.", "path": "/en/privacy.html" },
-    { "name": "legal", "title": "mantis licences and dependencies", "description": "Website and product licences, plus version-specific dependency information.", "path": "/en/legal.html" },
-    { "name": "404", "title": "Page not found · mantis", "description": "Find your way back to mantis or its documentation.", "path": "/404.html", "noindex": true }
+    {
+      "name": "index",
+      "title": "mantis \u00b7 tripwire URLs that tell you when they are fetched",
+      "description": "Plant a tripwire URL in a document, device, or website. Get an alert when it is fetched. Self-hosted or Cloudflare edge. Open source.",
+      "path": "/en/"
+    },
+    {
+      "name": "about",
+      "title": "About mantis",
+      "description": "What mantis detects, how it works, and where a canary fits in your security setup.",
+      "path": "/en/about.html"
+    },
+    {
+      "name": "docs",
+      "title": "mantis documentation",
+      "description": "Get started with mantis: setup, compatibility, device bundles, deployment, and the CLI and API references.",
+      "path": "/en/docs.html"
+    },
+    {
+      "name": "privacy",
+      "title": "mantis website privacy",
+      "description": "How this website uses local storage, its GitHub CI request, and Cloudflare hosting.",
+      "path": "/en/privacy.html"
+    },
+    {
+      "name": "legal",
+      "title": "mantis licences and dependencies",
+      "description": "Website and product licences, plus version-specific dependency information.",
+      "path": "/en/legal.html"
+    },
+    {
+      "name": "404",
+      "title": "Page not found \u00b7 mantis",
+      "description": "Find your way back to mantis or its documentation.",
+      "path": "/404.html",
+      "noindex": true
+    },
+    {
+      "name": "accessibility",
+      "title": "Accessibility and reading settings \u00b7 mantis",
+      "description": "Keyboard help, reading settings, and accessibility information for the Mantis website.",
+      "path": "/en/accessibility.html"
+    },
+    {
+      "name": "glossary",
+      "title": "Mantis glossary",
+      "description": "Plain-language explanations of Mantis terms and technical abbreviations.",
+      "path": "/en/glossary.html"
+    }
   ]
 }

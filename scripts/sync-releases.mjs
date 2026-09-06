@@ -3,16 +3,28 @@ import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { build } from './build.mjs';
 
+// Tag conventions in privacykey/mantis: `cli-v…` and `edge-v…` carry their
+// component prefix; the full server is the bare `v…` tag (that is what the
+// product's updating guide and the docs changelog treat as a server release —
+// see docs-mantis scripts/sync-changelog.mjs). `full-v…` is accepted too.
+const TAG_PREFIXES={cli:['cli-v'],full:['v','full-v'],edge:['edge-v']};
+const SEMVER='\\d+\\.\\d+\\.\\d+(?:[-+][\\w.-]+)?';
+
 // A tagged prerelease is still a release. Drafts are never published on the site.
 export function selectReleases(releases) {
   const components={};
-  for (const component of ['cli','full','edge']) {
-    const matches=releases.filter(r=>!r.draft && new RegExp(`^${component}-v\\d+\\.\\d+\\.\\d+(?:[-+][\\w.-]+)?$`).test(r.tag_name));
-    matches.sort((a,b)=>Date.parse(b.published_at)-Date.parse(a.published_at));
+  for (const [component,prefixes] of Object.entries(TAG_PREFIXES)) {
+    const matches=[];
+    for (const r of releases) {
+      if (r.draft) continue;
+      const prefix=prefixes.find(p=>new RegExp(`^${p.replace(/[-.]/g,'\\$&')}${SEMVER}$`).test(r.tag_name));
+      if (prefix) matches.push({r,version:r.tag_name.slice(prefix.length)});
+    }
+    matches.sort((a,b)=>Date.parse(b.r.published_at)-Date.parse(a.r.published_at));
     if (matches[0]) {
-      const r=matches[0];
+      const {r,version}=matches[0];
       if (!r.published_at || !Number.isFinite(Date.parse(r.published_at))) throw new Error('Missing publication date');
-      components[component]={tag:r.tag_name,version:r.tag_name.slice(component.length+2),url:`https://github.com/privacykey/mantis/releases/tag/${encodeURIComponent(r.tag_name)}`,published_at:r.published_at};
+      components[component]={tag:r.tag_name,version,url:`https://github.com/privacykey/mantis/releases/tag/${encodeURIComponent(r.tag_name)}`,published_at:r.published_at};
     }
   }
   return {source:'privacykey/mantis',components};

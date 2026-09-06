@@ -24,12 +24,17 @@ test('demo never reports delivery when no destination is configured',()=>{
   assert.match(d.execute('mantis new "Invalid" -w').join('\n'),/Give -w/);
   assert.equal(d.snapshot().keys.length,1);
 });
-test('release selection distinguishes real component releases from package versions and drafts',()=>{
+test('release selection maps each tag convention to its component and skips drafts',()=>{
   const r=(tag_name,published_at,draft=false)=>({tag_name,published_at,draft});
-  const out=selectReleases([r('cli-v0.1.0','2026-01-01'),r('cli-v0.2.0','2026-08-01'),r('cli-v9.0.0','2026-09-01',true),r('v0.1.4','2026-09-01')]);
-  assert.deepEqual(Object.keys(out.components),['cli']);
+  const out=selectReleases([r('cli-v0.1.0','2026-01-01'),r('cli-v0.2.0','2026-08-01'),r('cli-v9.0.0','2026-09-01',true),r('v0.2.0','2026-09-05'),r('full-v0.1.9','2026-09-01'),r('v9.0.0','2026-09-06',true)]);
+  assert.deepEqual(Object.keys(out.components),['cli','full']);
   assert.equal(out.components.cli.version,'0.2.0');
-  assert.equal(out.components.full,undefined);
+  // The bare `v…` tag is the server; a newer draft never wins.
+  assert.equal(out.components.full.tag,'v0.2.0');
+  assert.equal(out.components.full.version,'0.2.0');
+  assert.equal(out.components.edge,undefined);
+  // Unknown or malformed tags are ignored.
+  assert.deepEqual(Object.keys(selectReleases([r('release-1','2026-01-01'),r('v1','2026-01-01')]).components),[]);
 });
 test('lockfile reader keeps importer scope, exact versions, and excludes workspace links',()=>{
   const lock=`lockfileVersion: '9.0'\nimporters:\n\n  .:\n    dependencies:\n      '@mantis/core':\n        version: link:packages/core\n      ua-parser-js:\n        specifier: ^2.0.10\n        version: 2.0.10\n    devDependencies:\n      typescript:\n        version: 6.0.3\n  cli:\n    dependencies:\n      qrcode:\n        version: 1.5.4\npackages:\n  bogus:\n    version: 9.0.0\n`;

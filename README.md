@@ -112,9 +112,10 @@ node scripts/sync-releases.mjs
 ```
 
 This updates `version.json` and rebuilds every dependent page and metadata item.
-`GITHUB_TOKEN` is optional locally. The scheduled release workflow is read-only:
-it reports drift by failing the check, so updates can be reviewed and committed.
-It never pushes changes to `main`.
+`GITHUB_TOKEN` is optional locally. The scheduled release workflow runs the same
+sync every hour, checks the result, and opens or updates a pull request from
+`chore/sync-releases` when tagged releases have changed, so updates are reviewed
+before they are committed. It never pushes changes to `main`.
 
 The footer reports the newest **push run of the product's `ci.yml` on `main`**.
 It links to the actual checked run, shows the check time, caches for five minutes,

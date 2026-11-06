@@ -149,3 +149,13 @@ test('expired cache and network failure show unavailable rather than stale succe
   const f=await badgeFixture(null,{run:mainRun,time:Date.now()-6*60*1000},true);
   assert(f.request); assert.equal(f.badge.textContent,'main CI · unavailable');
 });
+test('the uptime probe is a fixed file with its own headers',async()=>{
+  // Blackbox fetches /offgrid every minute and expects "runner"; _headers types
+  // it and keeps it uncached so every probe reaches the asset store.
+  assert.equal((await readFile(new URL('../offgrid',import.meta.url),'utf8')).trim(),'runner');
+  const headers=await readFile(new URL('../_headers',import.meta.url),'utf8');
+  const rule=headers.match(/^\/offgrid\n((?:[ \t]+\S.*\n?)+)/m)?.[1]??'';
+  assert.match(rule,/Content-Type: text\/plain; charset=utf-8/);
+  assert.match(rule,/Cache-Control: no-cache/);
+  assert.match(rule,/X-Robots-Tag: noindex/);
+});

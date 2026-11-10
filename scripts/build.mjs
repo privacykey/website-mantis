@@ -2,6 +2,7 @@ import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { resolve } from 'node:path';
 import { createHash } from 'node:crypto';
+import { createDemo, demoLineClass, demoSequence, demoStep } from '../assets/demo-state.js';
 
 export const root = fileURLToPath(new URL('../', import.meta.url));
 const read = (path) => readFile(resolve(root, path), 'utf8');
@@ -28,6 +29,9 @@ export async function build({ check = false } = {}) {
   const themeIds = themes.map(t=>t.id);
   const themeBootstrap = `(function(){var d=document.documentElement;d.classList.replace('no-js','js');try{var t=localStorage.getItem('mantis-theme');if(${JSON.stringify(themeIds)}.includes(t))d.dataset.theme=t;}catch(e){}})();`;
   const values = { origin: config.origin, releases, themeOptions, themeBootstrap, reviewedAt: escape(config.reviewedAt), themeNames: themes.map(t=>escape(t.label)).join(', ') };
+  const demo = createDemo();
+  values.demoTranscript = demoSequence.flatMap(command => demoStep(demo,command))
+    .map(line => `<div class="${demoLineClass(line)}">${escape(line)}</div>`).join('\n          ');
   values.navigation = render(await read('site/partials/navigation.html'), values);
   const footerSource = await read('site/partials/footer.html');
   values.dependencyRows = dependencies.packages.map(p=>`<tr><th scope="row"><a href="${escape(p.metadataUrl)}">${escape(p.name)}</a></th><td data-label="Version">${escape(p.version)}</td><td data-label="Declared licence">${escape(p.license)}</td><td data-label="Used by">${escape(p.scopes.join(', '))}</td></tr>`).join('\n');

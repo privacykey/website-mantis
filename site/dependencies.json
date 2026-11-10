@@ -1,6 +1,6 @@
 {
-  "productRef": "42175e3e2ec8584ee5092a138dee406f15dd3b7f",
-  "checkedAt": "2026-09-05",
+  "productRef": "c9a6ec501d0747e69b218f06eef1b3df98430af5",
+  "checkedAt": "2026-11-10",
   "packages": [
     {
       "name": "@napi-rs/keyring",
@@ -59,21 +59,21 @@
     },
     {
       "name": "next",
-      "version": "16.2.12",
+      "version": "16.4.1",
       "scopes": [
         "full server"
       ],
       "license": "MIT",
-      "metadataUrl": "https://registry.npmjs.org/next/16.2.12"
+      "metadataUrl": "https://registry.npmjs.org/next/16.4.1"
     },
     {
       "name": "nodemailer",
-      "version": "9.0.3",
+      "version": "10.0.12",
       "scopes": [
         "full server"
       ],
       "license": "MIT-0",
-      "metadataUrl": "https://registry.npmjs.org/nodemailer/9.0.3"
+      "metadataUrl": "https://registry.npmjs.org/nodemailer/10.0.12"
     },
     {
       "name": "passkit-generator",
@@ -140,6 +140,15 @@
       "metadataUrl": "https://registry.npmjs.org/react-dom/19.2.8"
     },
     {
+      "name": "string-width",
+      "version": "8.3.0",
+      "scopes": [
+        "CLI"
+      ],
+      "license": "MIT",
+      "metadataUrl": "https://registry.npmjs.org/string-width/8.3.0"
+    },
+    {
       "name": "tailwindcss",
       "version": "4.3.3",
       "scopes": [
@@ -177,12 +186,12 @@
     },
     {
       "name": "undici",
-      "version": "8.10.0",
+      "version": "8.12.4",
       "scopes": [
         "full server"
       ],
       "license": "MIT",
-      "metadataUrl": "https://registry.npmjs.org/undici/8.10.0"
+      "metadataUrl": "https://registry.npmjs.org/undici/8.12.4"
     },
     {
       "name": "wrangler",
@@ -195,13 +204,13 @@
     },
     {
       "name": "zod",
-      "version": "4.4.3",
+      "version": "4.6.6",
       "scopes": [
         "full server",
         "CLI"
       ],
       "license": "MIT",
-      "metadataUrl": "https://registry.npmjs.org/zod/4.4.3"
+      "metadataUrl": "https://registry.npmjs.org/zod/4.6.6"
     }
   ]
 }

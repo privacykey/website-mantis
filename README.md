@@ -71,6 +71,13 @@ and the main-CI badge's filtering/cache behavior. `--links` also
 checks live documentation links and requires network access. Browser checks should
 cover narrow screens, keyboard navigation, copy feedback, and the edge URL form.
 
+Dashboard screenshots in `assets/screenshots/` were captured from the full server
+at [mantis c9a6ec5](https://github.com/privacykey/mantis/commit/c9a6ec501d0747e69b218f06eef1b3df98430af5).
+Refresh them using an isolated dashboard with synthetic keys and hits. The
+homepage transcript and replay share the same sequence in `assets/demo-state.js`.
+Compare the demo against the CLI source and keep any unreleased output labelled
+as a preview.
+
 ## Accessibility maintenance
 
 WCAG 2.2 AAA is the target, not a completed conformance claim. Read the

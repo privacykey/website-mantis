@@ -3,25 +3,18 @@
   <div class="container">
     <p class="hero-meta">Pre-1.0 · open source · {{releases}}</p>
     <h1>Plant a <span class="underline">tripwire.</span><br>Know when it's fetched.</h1>
-    <p class="lede">Hide a unique URL in a document, device, or website. When something fetches it, mantis records the request and sends an alert through your chosen destination.</p>
+    <p class="lede">Hide a unique URL in a document, device, or website. When something fetches it, mantis can send an alert through your chosen destination. The full server also keeps a hit history.</p>
     <div class="hero-actions"><a class="btn btn-primary" href="https://docs.mantis.privacykey.org/getting-started/">Get started →</a><a class="btn btn-ghost" href="#compare">Compare full and edge</a></div>
     <p class="hero-guidance">A fetch is a signal to investigate. <a href="#compatibility">Check what triggers each format.</a></p>
-    <div class="demo-layout">
+    <div class="demo-layout" id="terminal">
       <div class="hero-terminal" role="group" aria-label="Simulated mantis terminal">
-        <div class="term-bar"><span class="dot live" aria-hidden="true"></span><span class="title">mantis · simulation</span><button type="button" class="motion-control js-only" data-demo-motion>Pause animation</button></div>
+        <div class="term-bar"><span class="dot live" aria-hidden="true"></span><span class="title">mantis CLI · preview</span><button type="button" class="motion-control js-only" data-demo-motion>Pause animation</button></div>
         <div class="term-body" tabindex="0" role="region" aria-label="Demo transcript">
-          <div class="term-line">$ mantis new "Q4 forecast" -w https://hook.example.com/q4</div>
-          <div class="term-line">→ created demo-01</div>
-          <div class="term-line">$ mantis download last --docx Q4_forecast.docx</div>
-          <div class="term-line">→ generated Q4_forecast.docx</div>
-          <div class="term-line">$ mantis watch</div>
-          <div class="term-line">[simulation] A compatible reader fetched the URL.</div>
-          <div class="term-line">[hit] demo-01 · 198.51.100.24</div>
-          <div class="term-line">[simulation] Webhook alert delivered.</div>
+          {{demoTranscript}}
         </div>
         <form class="term-input-line js-only" aria-label="Try a demo command"><label class="sr-only" for="demo-command">Demo command</label><span class="prompt" aria-hidden="true">$</span><input id="demo-command" aria-describedby="demo-help" class="term-input" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Try mantis list"><button type="submit" class="demo-run">Run</button></form>
-        <div class="demo-controls js-only"><button type="button" data-demo-replay>Replay demo</button><button type="button" data-demo-skip hidden>Skip animation</button><button type="button" data-demo-command='mantis new "My demo key" -w https://hook.example.com/demo'>Create a key</button><button type="button" data-demo-command="mantis list">List keys</button><button type="button" data-demo-trigger>Simulate a fetch</button></div>
-        <p id="demo-help" class="demo-disclaimer">Simulated keys and alerts. Type help for supported commands. Commands stay in this page; nothing is installed or sent.</p>
+        <div class="demo-controls js-only"><button type="button" data-demo-replay>Replay demo</button><button type="button" data-demo-skip hidden>Skip animation</button><button type="button" data-demo-command='mantis new "My demo key" -w https://hooks.example.invalid/demo'>Create a key</button><button type="button" data-demo-command="mantis list">List keys</button><button type="button" data-demo-command="mantis hits last">View hits</button><button type="button" data-demo-trigger>Simulate a fetch</button></div>
+        <p id="demo-help" class="demo-disclaimer">Try the <a href="https://github.com/privacykey/mantis/pull/112">redesigned CLI from the development branch</a> with simulated keys and alerts. Type <code>mantis --help</code> for commands.</p>
         <p class="sr-only" role="status" aria-live="polite" aria-atomic="true" data-demo-status></p>
       </div>
       <aside class="example-alert" aria-labelledby="alert-title">
@@ -65,7 +58,7 @@
           Stateful. Next.js + Postgres, web dashboard, REST API, retry queue.
         </p>
         <ul class="arch-points">
-          <li>Dashboard · timeline · multi-destination · revocation</li>
+          <li>Dashboard · hit history · notification routing · revocation</li>
           <li>Docker · Railway · Fly · Render · any VM</li>
         </ul>
         <a href="https://docs.mantis.privacykey.org/deployment/docker-local/">Deploy the full server →</a>
@@ -85,6 +78,27 @@
         <a href="#edge">Deploy edge step by step →</a>
       </article>
 
+    </div>
+  </div>
+</section>
+<section id="screenshots" aria-labelledby="dashboard-preview-title">
+  <div class="container">
+    <p class="kicker">full server dashboard</p>
+    <h2 id="dashboard-preview-title">See your keys and what hit them.</h2>
+    <p class="intro">Screenshots from the current dashboard with sample data. Select either image to see it at full size.</p>
+    <div class="screenshot-grid">
+      <figure>
+        <a href="/assets/screenshots/dashboard-keys.png">
+          <img src="/assets/screenshots/dashboard-keys.png" alt="Open full-size screenshot of the keys dashboard" width="1800" height="1110" loading="lazy" decoding="async">
+        </a>
+        <figcaption><strong>Keys overview.</strong> Search by label or ID and see the last hit and status for each key.</figcaption>
+      </figure>
+      <figure>
+        <a href="/assets/screenshots/dashboard-key.png">
+          <img src="/assets/screenshots/dashboard-key.png" alt="Open full-size screenshot of the Q4 forecast key" width="1800" height="1110" loading="lazy" decoding="async">
+        </a>
+        <figcaption><strong>Key detail.</strong> Copy the tripwire URL and see the document format first downloaded for that key.</figcaption>
+      </figure>
     </div>
   </div>
 </section>

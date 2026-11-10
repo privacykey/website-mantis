@@ -2,19 +2,23 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import vm from 'node:vm';
-import { createDemo } from '../assets/demo-state.js';
+import { createDemo, demoLineClass, demoSequence, demoStep } from '../assets/demo-state.js';
 import { selectReleases } from '../scripts/sync-releases.mjs';
 import { parseImporters } from '../scripts/sync-dependencies.mjs';
 
 test('demo keys, generated files, and hits stay consistent',()=>{
   const d=createDemo();
   d.execute('mantis new "Payroll sample" -w https://hook.example.com/demo');
-  assert.match(d.execute('mantis list').join('\n'),/Payroll sample · 0/);
+  assert.match(d.execute('mantis list').join('\n'),/age +notify +status/);
+  assert.match(d.execute('mantis show last').join('\n'),/Payroll sample/);
   d.execute('mantis download last --docx payroll.docx');
   assert.deepEqual(d.snapshot().keys[0].files,['payroll.docx']);
-  assert.match(d.trigger().join('\n'),/Webhook alert delivered/);
-  assert.match(d.execute('mantis list').join('\n'),/Payroll sample · 1/);
-  assert.match(d.execute('mantis hits').join('\n'),/198\.51\.100\.24/);
+  assert.match(d.execute('mantis hits last').join('\n'),/No hits yet/);
+  d.execute('mantis watch');
+  assert.match(d.trigger().join('\n'),/Payroll sample +198\.51\.100\.24.*Webhook alert delivered/s);
+  d.execute('stop');
+  assert.doesNotMatch(d.trigger().join('\n'),/Payroll sample/);
+  assert.match(d.execute('mantis hits last').join('\n'),/198\.51\.100\.24.*✓1/);
   d.reset(); assert.equal(d.snapshot().keys.length,0);
 });
 test('demo never reports delivery when no destination is configured',()=>{
@@ -64,7 +68,7 @@ async function simulationFixture({reduced=false,reading=false,saved=null,focused
   const document={documentElement:{dataset:{readingView:String(reading)}},activeElement:focusedInput?input:null,querySelector:s=>s==='.hero-terminal'?terminal:null,createElement:()=>element()};
   for(const el of Object.values(elements))el.focus=()=>{document.activeElement=el;};
   const source=(await readFile(new URL('../assets/mantis-terminal.js',import.meta.url),'utf8')).replace(/^import .*?;\n/,'');
-  vm.runInNewContext(source,{createDemo,console:{warn(){}},window:{matchMedia:()=>media},document,
+  vm.runInNewContext(source,{createDemo,demoLineClass,demoSequence,demoStep,console:{warn(){}},window:{matchMedia:()=>media},document,
     localStorage:{getItem:k=>storage.get(k),setItem:(k,v)=>storage.set(k,v)},
     setTimeout(fn){timers.set(++timerId,fn);return timerId;},clearTimeout(id){timers.delete(id);}});
   return {body,form,input,status,replay,skip,trigger,motion,document,media,timers,storage,
@@ -74,9 +78,9 @@ async function simulationFixture({reduced=false,reading=false,saved=null,focused
 test('autoplay starts by default, completes silently, and never takes keyboard focus',async()=>{
   const f=await simulationFixture();
   assert.equal(f.motion.textContent,'Pause animation');assert.equal(f.timers.size,1);
-  assert.match(f.transcript(),/created demo-01/);assert.equal(f.document.activeElement,null);
+  assert.match(f.transcript(),/✓ Created Q4 forecast/);assert.equal(f.document.activeElement,null);
   assert.equal(f.input.disabled,false);assert.equal(f.trigger.disabled,false);
-  f.finish();assert.match(f.transcript(),/1 total/);assert.equal(f.skip.hidden,true);
+  f.finish();assert.match(f.transcript(),/1 hit · Q4 forecast/);assert.equal(f.skip.hidden,true);
   assert.equal(f.status.textContent,'');assert.equal(f.document.activeElement,null);
 });
 test('pause freezes the sequence, persists, and resumes from the same step',async()=>{
@@ -86,14 +90,14 @@ test('pause freezes the sequence, persists, and resumes from the same step',asyn
   assert.equal(f.storage.get('mantis-motion-v1'),'paused');
   f.body.focus();f.body.events.focus();assert.equal(f.transcript(),before);
   const next=await simulationFixture({saved:f.storage.get('mantis-motion-v1')});assert.equal(next.timers.size,0);
-  f.motion.events.click();assert.equal(f.timers.size,1);f.finish();assert.match(f.transcript(),/1 total/);
+  f.motion.events.click();assert.equal(f.timers.size,1);f.finish();assert.match(f.transcript(),/1 hit · Q4 forecast/);
 });
 for(const options of [{reduced:true},{reading:true},{saved:'paused'}])test(`${JSON.stringify(options)} suppresses autoplay and keeps immediate replay interactive`,async()=>{
   const f=await simulationFixture(options);assert.equal(f.timers.size,0);
   f.replay.focus();f.replay.events.click();assert.equal(f.timers.size,0);
-  assert.match(f.transcript(),/Generated Q4_forecast.docx/);assert.match(f.status.textContent,/Demo complete/);
+  assert.match(f.transcript(),/Simulated save to Q4_forecast.docx/);assert.match(f.status.textContent,/Demo complete/);
   assert.equal(f.document.activeElement,f.replay);assert.equal(f.skip.hidden,true);
-  f.trigger.events.click();assert.match(f.status.textContent,/2 total/);
+  f.trigger.events.click();assert.match(f.status.textContent,/2 hits recorded/);
 });
 test('typing interrupts autoplay so later timer steps cannot overwrite a user command',async()=>{
   const f=await simulationFixture();f.input.focus();f.input.events.focus();assert.equal(f.timers.size,0);
@@ -106,7 +110,7 @@ test('a late-loading demo script does not start autoplay when the visitor is alr
 });
 test('skipping a replay restores focus and changing reduced motion stops a running sequence',async()=>{
   const f=await simulationFixture();f.skip.focus();f.skip.events.click();
-  assert.equal(f.document.activeElement,f.replay);assert.equal(f.timers.size,0);assert.match(f.transcript(),/1 total/);
+  assert.equal(f.document.activeElement,f.replay);assert.equal(f.timers.size,0);assert.match(f.transcript(),/1 hit · Q4 forecast/);
   f.replay.events.click();assert.equal(f.timers.size,1);
   f.media.matches=true;f.media.change({matches:true});assert.equal(f.timers.size,0);
   assert.equal(f.motion.disabled,true);assert.equal(f.motion.textContent,'Reduced motion on');assert.equal(f.skip.hidden,true);

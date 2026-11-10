@@ -1,4 +1,4 @@
-import { createDemo } from "/assets/demo-state.js?v=04d78b9ad991";
+import { createDemo, demoLineClass, demoSequence, demoStep } from "/assets/demo-state.js?v=a7197c0cfe55";
 /**
  * mantis — hero interaction layer.
  *
@@ -462,19 +462,14 @@ import { createDemo } from "/assets/demo-state.js?v=04d78b9ad991";
   var replayRequested = false;
   function write(line) {
     var div = document.createElement('div');
-    div.className = 'term-line';
+    div.className = demoLineClass(line);
     div.textContent = line;
     body.appendChild(div);
     while (body.children.length > 100) body.firstElementChild.remove();
     body.scrollTop = body.scrollHeight;
   }
   function announce(text) { status.textContent = text; }
-  function seed() {
-    demo.reset(); demo.create('Q4 forecast',true);
-    demo.execute('mantis download last --docx Q4_forecast.docx');
-    demo.execute('mantis watch'); demo.trigger();
-  }
-  seed();
+  demoSequence.forEach(function(command){demoStep(demo,command);});
   function stopReplay() {
     var hadSkipFocus = document.activeElement === skipButton;
     clearTimeout(replayTimer);replayTimer=null;
@@ -494,21 +489,19 @@ import { createDemo } from "/assets/demo-state.js?v=04d78b9ad991";
     if(animationEnabled())globe.ping({alarmed:true});
     if (userAction) announce(lines.join(' '));
   }
-  var sequence = [
-    function(){run('mantis new "Q4 forecast" -w https://hook.example.com/q4',false);},
-    function(){run('mantis download last --docx Q4_forecast.docx',false);},
-    function(){run('mantis watch',false);},
-    function(){write('[simulation] A compatible reader fetched the embedded URL.');trigger(false);}
-  ];
+  function replayStep(command) {
+    demoStep(demo,command).forEach(write);
+    if(command === null && animationEnabled())globe.ping({alarmed:true});
+  }
   function showCompleted() {
     stopReplay();demo.reset();body.replaceChildren();
-    sequence.forEach(function(step){step();});
+    demoSequence.forEach(replayStep);
   }
   function advanceReplay() {
     replayTimer=null;
     if(!playing || !animationEnabled())return;
-    sequence[nextStep++]();
-    if(nextStep===sequence.length) {
+    replayStep(demoSequence[nextStep++]);
+    if(nextStep===demoSequence.length) {
       stopReplay();
       if(replayRequested)announce('Demo complete. One key, one generated document, and one simulated hit.');
     } else replayTimer=setTimeout(advanceReplay,1100);
